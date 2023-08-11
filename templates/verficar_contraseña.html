@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Luxx Art || Recuperar contraseña</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <body>
+<style>
+    .login-box {
+    width: 320px;
+    height: 480px;
+    background: #fff;
+    color: #000;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    padding: 70px 30px;
+  }
+  
+</style>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <script>
+          Swal.fire(
+            '{{ category }}!',
+            '{{ message }}',
+            '{{ category.lower() }}'
+          );
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  
+
+    <section class="login-box">
+      <img src="/static/img/5.png" class="avatar" alt="Avatar Image">
+      <h1>Recuperar Contraseña</h1>
+      <form method="post" action="/nueva_contraseña">
+        <input type="text" name="correo" value="{{ correo }}" hidden>
+        <!-- USERNAME INPUT -->
+        <label for="username">Codigo de verficacion</label>
+        <input type="text" name="codigo_verficacion" required>
+        <label for="username">Nueva contraseña</label>
+        <input type="password" name="contraseña_nueva" required>
+        <label for="username">confirmar contraseña</label>
+        <input type="password" name="confirmacion" required>
+     
+    
+        
+       
+        <input type="submit" value="Cambiar">
+        <a href="/login">Iniciar session?</a><br>
+        <a href="/registro">Registrar Usuario?</a>
+      </form>
+    </section>
+  </body>
+</html>

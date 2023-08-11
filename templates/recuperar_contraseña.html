@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/png" href="/static/img/2.png">
+    <title>Luxx Art || Recuperar contraseña</title>
+    <link rel="stylesheet" href="static/css/login.css">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <body>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+    {% for message in messages %}
+    <script>
+        Swal.fire(
+  'Error!',
+  '{{message}}',
+  'error'
+)
+     </script>
+    {% endfor %}
+
+    {% endif %}
+    {% endwith %}
+
+    <section class="login-box">
+      <img src="static/img/5.png" class="avatar" alt="Avatar Image">
+      <h1>Recuperar Contraseña</h1>
+      <form method="post" action="/recuperar_contraseña">
+        <br>
+        <br>
+        <br>
+        <!-- USERNAME INPUT -->
+        <label for="username">Usuario</label>
+        <input type="text" name="correo" placeholder="Correo electronico asociado">
+       <br>
+       <br>
+       <br>
+       <br>
+    
+        
+       
+        <input type="submit" value="Log In">
+        <a href="/login">Iniciar session?</a><br>
+        <a href="/registro">Registrar Usuario?</a>
+      </form>
+    </section>
+  </body>
+</html>

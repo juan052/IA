@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Luxx Art</title>
+    <link rel="stylesheet" href="static/css/login.css">
+    <link rel="icon" type="image/png" href="/static/img/2.png">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <body>
+    <style>
+      /* styles.css */
+  
+  .flash-message {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .flash-message.success {
+    background-color: #4CAF50;
+    color: #ffffff;
+  }
+  
+  .flash-message.error {
+    background-color: #FF0000;
+    color: #ffffff;
+  }
+  
+  .flash-message.warning {
+    background-color: #FFC107;
+    color: #000000;
+  }
+  
+  </style>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <script>
+            Swal.fire(
+              '{{ category }}!',
+              '{{ message }}',
+              '{{ category.lower() }}'
+            );
+          </script>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="login-box">
+      <img src="static/img/5.png" class="avatar" alt="Avatar Image">
+      <h1>Iniciar sesion</h1>
+      <form method="post" action="/validar">
+        <!-- USERNAME INPUT -->
+        <label for="username">Usuario</label>
+        <input type="text" name="usuario" placeholder="Enter Username">
+        <!-- PASSWORD INPUT -->
+        <label for="password">Contraseña</label>
+        <input type="password" name="contraseña" placeholder="Enter Password">
+        <input type="submit" value="Log In">
+        <a href="/recuperar_contraseña">Has olvidado tu contraseña?</a>
+        <br>
+        <a href="/registro">Registrar Usuario?</a>
+      </form>
+    </div>
+  </body>
+</html>

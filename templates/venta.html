@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% block title %} || Ventas{% endblock %}
+{% block css %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block main %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Ventas</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Gestion de Ventas</a></li>
+                    <li class="breadcrumb-item active">Ventas</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-tabs">
+                    <div class="card-header p-0 pt-1">
+                        <ul class="nav nav-tabs" id="custom-tabs-five-tab"
+                            role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="lista_pedidoss"
+                                    data-toggle="pill"
+                                    href="#lista_pedidos" role="tab"
+                                    aria-controls="custom-tabs-five-normal-pedidos"
+                                    aria-selected="false">Ventas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="custom-tabs-five-normal-tab"
+                                    data-toggle="pill"
+                                    href="#nuevos_pedidos" role="tab"
+                                    aria-controls="custom-tabs-five-normal"
+                                    aria-selected="false">Solicitudes de venta
+                                  
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="custom-tabs-five-normal-tab"
+                                    data-toggle="pill"
+                                    href="#nuevos_pedidos_p" role="tab"
+                                    aria-controls="custom-tabs-five-normal"
+                                    aria-selected="false">Solicitudes de venta
+                                    por pedido personalizado
+                                 
+                                    <span class="right badge badge-danger"></span>
+                                  
+                                </a>
+                            </li>
+                           
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id>
+                            <div class="tab-pane fade show active"
+                                id="lista_pedidos" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-overlay-tab">
+                                <div class="overlay-wrapper">
+
+                                    <table id="example1"
+                                        class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Codigo</th>
+                                                <th>Tipo Venta</th>
+                                                <th>Cliente</th>
+                                                <th>Tipo de entrega</th>
+                                                <th>Fecha</th>
+                                                <th>Estado</th>
+                                                <th>Accion</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for venta in ventas %}
+                                            <tr>
+                                                <td>{{ venta.codigo }}</td>
+                                                <td>{{ venta.tipo_venta.nombre }}</td>
+                                                <td>{{ venta.cliente.persona.nombre }}</td>
+                                                <td>{{venta.tipo_entrega}}</td>
+                                                <td>{{ venta.fecha }}</td>
+                                                <td>
+                                                    {% if venta.estado == 2 %}
+                                                     <span class="badge bg-primary">En proceso</span>
+                                                    {% elif venta.estado == 3 %}
+                                                     <span class="badge bg-success">Finalizada</span>
+                                                    {% elif venta.estado == 4 %}
+                                                     <span class="badge bg-danger">Anulada</span>
+                                                    {% endif %}
+                                                   
+                                                   
+                                                </td>
+                                                <td>
+                                                    <a  href="#modal-default{{venta.id}}" data-toggle="modal" class="fas fa-pencil-alt"></a>
+                                                    <a
+                                                        href="#modal-danger1{{venta.id}}"
+                                                        class="fas fa-trash-alt" data-toggle="modal">
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="nuevos_pedidos"
+                                role="tabpanel"
+                                aria-labelledby="custom-tabs-five-overlay-dark-tab">
+                                <div class="overlay-wrapper">
+                                    <div class="row">
+                                        {% for venta_data in ventas_con_productos %}
+    {% set venta = venta_data['venta'] %}
+    {% set detalles_venta = venta_data['detalles_venta'] %}
+                                        
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Nuevo pedido ° {{ venta.id }}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Cliente:</strong> {{ venta.cliente.persona.nombre }} {{ venta.cliente.persona.persona_natural.apellido }}</p>
+                <p><strong>Productos:</strong></p>
+                <ul>
+                    {% for detalle in detalles_venta %}
+                        <li>{{ detalle.producto.nombre }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Subtotal cliente:</strong> {{ venta.subtotal }}</p>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                        Opciones
+                    </button>
+                    <div class="dropdown-menu">
+                        
+                        <a class="dropdown-item" href="#modal-dangerss{{ venta.id }}" data-toggle="modal">Crear venta</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="nuevos_pedidos_p"
+                                role="tabpanel"
+                                aria-labelledby="custom-tabs-five-overlay-dark-tab">
+                                <div class="overlay-wrapper">
+                                    <div class="row">
+                                        {%for pedidos in confirmar%}
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">ID ° {{pedidos.id}}</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p><strong>Cliente:</strong>
+                                                        {{pedidos.personalizacion.cliente.persona.nombre}}
+                                                        {{pedidos.personalizacion.cliente.persona.persona_natural.apellido}}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Descripcion de
+                                                            pedido:</strong>
+                                                        {{pedidos.personalizacion.descripcion}}
+                                                    </p>
+                                                    <p>
+                                                        <strong> Costo total:</strong>
+                                                        {{pedidos.costo_total}}
+                                                    </p>
+                                                    <div class="btn-group">
+                                                        
+                                                     
+                                                            
+                                                            <a
+                                                                class="btn btn-success"
+                                                                href="#modal-dangers{{pedidos.id}}"
+                                                                data-toggle="modal">Crear venta</a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {%endfor%}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="presupuesto_enviados" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-normal-tab">
+
+                            </div>
+                            <div class="tab-pane fade"
+                                id="pedidos_rechazados" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-normal-tab">
+                                <table id="example1"
+                                    class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tipo de cliente</th>
+                                            <th>Nombre</th>
+                                            <th>Descripcion</th>
+                                            <th>Presupuesto</th>
+                                            <th>Estado</th>
+                                            <th>Diseño</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for categoria in rechazados %}
+                                        <tr>
+                                            <td>{{loop.index}}</td>
+                                            <td>{{categoria.cliente.tipo_cliente}}</td>
+                                            <td>
+                                                {{categoria.cliente.persona.nombre}}
+                                            </td>
+                                            <td>{{categoria.descripcion}}</td>
+                                            <th>C$ {{categoria.presupuesto}}</th>
+
+                                            <td>
+                                                {%if
+                                                categoria.estado
+                                                == 0%}
+                                                <span class="badge bg-black">Solicitado</span>
+                                                {%elif
+                                                categoria.estado==
+                                                1%}
+                                                <span
+                                                    class="badge bg-danger">Rechazado</span>
+                                                {%elif
+                                                categoria.estado==
+                                                2%}
+                                                <span class="badge bg-blue">En
+                                                    espera de
+                                                    confirmacion</span>
+                                                {% else %}
+                                                <span
+                                                    class="badge bg-danger">Descartado</span>
+                                                {%endif%}
+                                            </td>
+                                            <td>
+                                                <img
+                                                    src="{{ url_for('static',
+                                                filename='img/imagenes/' + categoria.fotos)
+                                                }}" alt="Foto actual"
+                                                    width="50" alt>
+                                            </td>
+
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+   
+    {% for categoria in pedido %}
+    <div class="modal fade" id="modal-imagen{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content  align-content-center">
+
+                <img src="{{ url_for('static',
+                    filename='img/imagenes/' + categoria.fotos)
+                    }}" width="100%">
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger"
+                        data-dismiss="modal">Cancelar</button>
+                    <a href="{{ url_for('static',
+                    filename='img/imagenes/' + categoria.fotos)
+                    }}" class="btn btn-success" download>Guardar</a>
+                </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% endfor %}
+    {% for categoria in ventas %}
+    <div class="modal fade" id="modal-default{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content bg-success">
+                <form action="/completar" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Completar venta</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="id"
+                            value="{{categoria.id}}"
+                            hidden>
+                        <input type="text" name="estado" value="2" hidden>
+                     Estas completando una venta
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% endfor %}
+    {% for categoria in ventas %}
+    <div class="modal fade" id="modal-danger1{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <form action="/anular" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Anular venta</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="id"
+                            value="{{categoria.id}}"
+                            hidden>
+                        <input type="text" name="estado" value="2" hidden>
+                     Estas  anulando venta
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% endfor %}
+
+    {%for categoria in confirmar%}
+    <div class="modal fade" id="modal-dangers{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content bg-blue">
+                <form action="/crear_venta_pedido" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Crea venta por pedido</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="estado" value="1" hidden>
+                        <input type="text" name="id_cliente" value="{{categoria.personalizacion.id_cliente}}" hidden>
+                        <input type="text" name="id"
+                            value="{{categoria.personalizacion.id}}"
+                            hidden>
+                            <input type="text" name="costo_total"
+                            value="{{categoria.costo_total}}"
+                            hidden>
+                       <input type="number" name="descuento" class="form-control">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {%endfor%}
+    {% for categoria in ventas_con_productos %}
+    {% set venta = categoria['venta'] %}
+    <div class="modal fade" id="modal-dangerss{{ venta.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/crear_venta_pedidos" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Crear venta por pedido</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="id"
+                            value="{{ venta.id }}" hidden>
+                        <input type="text" name="estado" value="2" hidden>
+                        <div class="form-group">
+                            <label>Descuento hacia el pedido</label>
+                            <input type="number" name="descuento"
+                                id="descuento"
+                                min="0"
+                                class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endfor %}
+</section>
+{% endblock %}

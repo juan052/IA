@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+{% block title %} || Pedidos{% endblock %}
+{% block css %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block main %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Pedidos de personalizados</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Gestion de Pedidos</a></li>
+                    <li class="breadcrumb-item active">Pedidos</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+       
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-tabs">
+                    <div class="card-header p-0 pt-1">
+                        <ul class="nav nav-tabs" id="custom-tabs-five-tab"
+                            role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="lista_pedidoss"
+                                    data-toggle="pill"
+                                    href="#lista_pedidos" role="tab"
+                                    aria-controls="custom-tabs-five-normal-pedidos"
+                                    aria-selected="false">Lista de pedidos
+                                    confirmados</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="custom-tabs-five-normal-tab"
+                                    data-toggle="pill"
+                                    href="#nuevos_pedidos" role="tab"
+                                    aria-controls="custom-tabs-five-normal"
+                                    aria-selected="false">Nuevas solicitudes de
+                                    pedidos 
+                                    {%if cantidad_pedidos > 0 %} 
+                                    <span class="right badge badge-danger">{{cantidad_pedidos}}</span>
+                                    {% endif %}
+                                    </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="custom-tabs-five-normal-tab"
+                                    data-toggle="pill"
+                                    href="#presupuesto_enviados" role="tab"
+                                    aria-controls="custom-tabs-five-normal"
+                                    aria-selected="false">Presupuesto enviados</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    id="custom-tabs-five-normal-tab"
+                                    data-toggle="pill"
+                                    href="#pedidos_rechazados" role="tab"
+                                    aria-controls="custom-tabs-five-normal"
+                                    aria-selected="false">Pedidos rechazados
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id>
+                            <div class="tab-pane fade show active"
+                                id="lista_pedidos" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-overlay-tab">
+                                <div class="overlay-wrapper">
+
+                                    <table id="example1"
+                                        class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Tipo de cliente</th>
+                                                <th>Cliente</th>
+                                                <th>Descripcion</th>
+                                                <th>Costo total</th>
+                                                <th>Fecha de entrega</th>
+                                                <th>Estado</th>
+                                                <th>Foto de inspiracion</th>
+                                                <th>Accion</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {%for categoria in detalle_pedidos
+                                            %}
+                                            <tr>
+                                                <td>{{loop.index}}</td>
+                                                <td>{{categoria.personalizacion.cliente.tipo_cliente}}</td>
+                                                <td>
+                                                    {{categoria.personalizacion.cliente.persona.nombre}}
+                                                </td>
+                                                <td>{{categoria.personalizacion.descripcion}}</td>
+                                                <td>C$
+                                                    {{categoria.costo_total}}</td>
+
+                                                <td>{{categoria.fecha_entrega}}</td>
+                                                <td>
+                                                    {%if
+                                                    categoria.personalizacion.estado
+                                                    == 0%}
+                                                    <span class="badge bg-black">Solicitado</span>
+                                                    {%elif categoria.personalizacion.estado==
+                                                    3%}
+                                                    <span
+                                                        class="badge bg-success">Confirmados</span>
+                                                    {%elif
+                                                    categoria.personalizacion.estado==
+                                                    2%}
+                                                    <span class="badge bg-blue">En
+                                                        espera de
+                                                        confirmacion</span>
+                                                    {% else %}
+                                                    <span
+                                                        class="badge bg-danger">Descartado {{categoria.personalizacion.estado}}</span>
+                                                    {%endif%}
+                                                </td>
+                                                <td>
+                                                    <img
+                                                        src="{{ url_for('static',
+                                                        filename='img/imagenes/' + categoria.personalizacion.fotos)
+                                                        }}" alt="Foto actual"
+                                                        width="50" alt download>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-default dropdown-toggle dropdown-icon"
+                                                            data-toggle="dropdown">
+                                                            Opciones
+                                                        </button>
+                                                        <div
+                                                            class="dropdown-menu">
+                                                            <a
+                                                                class="dropdown-item"
+                                                              href="{{ url_for('static',
+                                                              filename='img/imagenes/' + categoria.personalizacion.fotos)
+                                                              }}" download>Descargar imagen</a>
+                                                            <a
+                                                                class="dropdown-item"
+                                                                href="#modal-default1{{categoria.id}}"
+                                                                data-toggle="modal">
+                                                                Marca como terminado</a>
+                                                      
+                                                        </div>
+                                                    </div>
+                                                   
+                                                </td>
+                                            </tr>
+                                            {%endfor%}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="nuevos_pedidos"
+                                role="tabpanel"
+                                aria-labelledby="custom-tabs-five-overlay-dark-tab">
+                                <div class="overlay-wrapper">
+                                    <div class="row">
+                                        {%for pedidos in pedido%}
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Nuevo
+                                                        pedido ° {{pedidos.id}}</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p><strong>Cliente:</strong>
+                                                        {{pedidos.cliente.persona.nombre}} {{pedidos.cliente.persona.persona_natural.apellido}}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Descripcion de
+                                                            pedido:</strong>
+                                                        {{pedidos.descripcion}}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Presupuesto del
+                                                            cliente:</strong>
+                                                        {{pedidos.presupuesto}}
+                                                    </p>
+                                                    <div class="btn-group">
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-default dropdown-toggle dropdown-icon"
+                                                            data-toggle="dropdown">
+                                                            Opciones
+                                                        </button>
+                                                        <div
+                                                            class="dropdown-menu">
+                                                            <a
+                                                                class="dropdown-item"
+                                                                href="#modal-imagen{{pedidos.id}}"
+                                                                data-toggle="modal">Ver
+                                                                imagen</a>
+                                                            <a
+                                                                class="dropdown-item"
+                                                                href="#modal-default{{pedidos.id}}"
+                                                                data-toggle="modal">Enviar
+                                                                Repuesta</a>
+                                                            <a
+                                                                class="dropdown-item"
+                                                                href="#modal-danger{{pedidos.id}}" data-toggle="modal">Rechazar
+                                                                pedido</a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {%endfor%}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="presupuesto_enviados" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-normal-tab">
+                                <table id="example1"
+                                    class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tipo de cliente</th>
+                                            <th>Nombre</th>
+                                            <th>Descripcion</th>
+                                            <th>Costo</th>
+                                            <th>Fecha de entrega</th>
+                                            <th>Estado</th>
+                                            <th>Diseño</th>
+                                           
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for categoria in enviados %}
+                                        <tr>
+                                            <td>{{loop.index}}</td>
+                                            <td>{{categoria.personalizacion.cliente.tipo_cliente}}</td>
+                                            <td>
+                                                {{categoria.personalizacion.cliente.persona.nombre}}
+                                            </td>
+                                            <td>{{categoria.personalizacion.descripcion}}</td>
+                                            <th>C$ {{categoria.costo_total}}</th>
+                                            <th>{{categoria.fecha_entrega}}</th>
+                                            <td>
+                                                {%if
+                                                categoria.personalizacion.estado
+                                                == 0%}
+                                                <span class="badge bg-black">Solicitado</span>
+                                                {%elif
+                                                categoria.personalizacion.estado==
+                                                1%}
+                                                <span
+                                                    class="badge bg-success">Activo</span>
+                                                {%elif
+                                                categoria.personalizacion.estado==
+                                                2%}
+                                                <span class="badge bg-blue">En
+                                                    espera de
+                                                    confirmacion</span>
+                                                {% else %}
+                                                <span
+                                                    class="badge bg-danger">Descartado</span>
+                                                {%endif%}
+                                            </td>
+                                            <td>
+                                                <img
+                                                    src="{{ url_for('static',
+                                                filename='img/imagenes/' + categoria.personalizacion.fotos)
+                                                }}" alt="Foto actual"
+                                                    width="50" alt>
+                                            </td>
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade"
+                                id="pedidos_rechazados" role="tabpanel"
+                                aria-labelledby="custom-tabs-five-normal-tab">
+                                <table id="example1"
+                                    class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tipo de cliente</th>
+                                            <th>Nombre</th>
+                                            <th>Descripcion</th>
+                                            <th>Presupuesto</th>
+                                            <th>Estado</th>
+                                            <th>Diseño</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for categoria in rechazados %}
+                                        <tr>
+                                            <td>{{loop.index}}</td>
+                                            <td>{{categoria.cliente.tipo_cliente}}</td>
+                                            <td>
+                                                {{categoria.cliente.persona.nombre}}
+                                            </td>
+                                            <td>{{categoria.descripcion}}</td>
+                                            <th>C$ {{categoria.presupuesto}}</th>
+                                          
+                                            <td>
+                                                {%if
+                                                categoria.estado
+                                                == 0%}
+                                                <span class="badge bg-black">Solicitado</span>
+                                                {%elif
+                                                categoria.estado==
+                                                1%}
+                                                <span
+                                                    class="badge bg-danger">Rechazado</span>
+                                                {%elif
+                                                categoria.estado==
+                                                2%}
+                                                <span class="badge bg-blue">En
+                                                    espera de
+                                                    confirmacion</span>
+                                                    
+                                                {% else %}
+                                                <span
+                                                    class="badge bg-danger">Descartado</span>
+                                                {%endif%}
+                                            </td>
+                                            <td>
+                                                <img
+                                                    src="{{ url_for('static',
+                                                filename='img/imagenes/' + categoria.fotos)
+                                                }}" alt="Foto actual"
+                                                    width="50" alt>
+                                            </td>
+                                           
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/crear_categoria" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Crear Categoria</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" name="nombre"
+                                class="form-control"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripcion</label>
+                            <textarea name="descripcion"
+                                class="form-control"
+                                required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select name="estado" id
+                                class="form-control">
+                                <option value="1">Activo</option>
+                                <option value="2">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% for categoria in pedido %}
+    <div class="modal fade" id="modal-imagen{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content  align-content-center">
+                
+                    <img src="{{ url_for('static',
+                    filename='img/imagenes/' + categoria.fotos)
+                    }}" width="100%">
+               
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger"
+                        data-dismiss="modal">Cancelar</button>
+                    <a href="{{ url_for('static',
+                    filename='img/imagenes/' + categoria.fotos)
+                    }}" class="btn btn-success" download>Guardar</a>
+                </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% endfor %}
+    {% for categoria in pedido %}
+    <div class="modal fade" id="modal-default{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/detalle_pedidos" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Enviar propuesta</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="id"
+                            value="{{categoria.id}}"
+                            hidden>
+                        <input type="text" name="estado" value="2" hidden>
+                        <div class="form-group">
+                            <label>Costo total del pedido</label>
+                            <input type="text" name="costo_total"
+                                id="costo_total"
+                                value
+                                class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nota <span>Se le enviara al cliente</span></label>
+                            <textarea id="nota" name="nota"
+                                class="form-control" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de entrega del pedido</label>
+                            <input type="date" name="fecha_entrega"
+                                id="fecha_entrega"
+                                value
+                                class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {% endfor %}
+
+    {%for categoria in pedido%}
+    <div class="modal fade" id="modal-danger{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <form action="/detalle_pedidos" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Rechzar pedido</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="estado" value="1" hidden>
+                        <input type="text" name="id"
+                            value="{{categoria.id}}"
+                            hidden>
+                        <p>Estas seguro que quieres rechazar el pedido</p>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {%endfor%}
+    {%for categoria in detalle_pedidos
+        %}
+    <div class="modal fade" id="modal-default1{{categoria.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content bg-success">
+                <form action="/terminar_pedido" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Rechzar pedido</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="estado" value="5" hidden>
+                        <input type="text" name="id"
+                            value="{{categoria.id}}"
+                            hidden>
+                        <p>Confirmacion de pedido</p>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light"
+                            data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    {%endfor%}
+</section>
+{% endblock %}

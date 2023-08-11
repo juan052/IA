@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %} || Precios servicios{% endblock %}
+{% block css %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block main %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Precios servicios</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Gestion de servicios</a></li>
+                    <li class="breadcrumb-item active">Precios servicios</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de servicios con sus
+                            precios</h3>
+                        <div class="align-content-end text-right">
+                            <button type="button" class="btn btn-secondary"
+                                data-toggle="modal" data-target="#modal-default">Agregar
+                                Precio servicios</button>
+                        </div>
+
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1"
+                            class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Servicios</th>
+                                    <th>Precio actual</th>
+                                    <th>Precio anterior</th>
+                                    <th>Estado</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for productos in Precios %}
+                                <tr>
+                                    <td>{{ productos.servicio.nombre }}</td>
+                                    <td>{{ productos.precio_actual }}</td>
+                                    <td>{{ productos.precio_anterior }}</td>
+                                    <td>
+                                        {% if productos.estado == 1 %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% elif productos.estado == 2 %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#modal-default{{productos.id}}"
+                                            data-toggle="modal">
+                                            <i
+                                                class="fas fa-pencil-alt"></i>
+                                        </a>
+
+                                        <a data-toggle="modal"
+                                            href="#modal-danger{{productos.id}}"
+                                            class="fas fa-trash-alt">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal HTML -->
+    <div id="modal-default" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/crear_precio_servicio" method="post"
+                    enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Asignar precio</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Servicios: </label>
+                            <select name="producto"
+                                id="producto"
+                                class="form-control select2bs4">
+                                {% for productos in servicio %}
+                               
+                                        <option
+                                            value="{{ productos.id }}">{{
+                                            productos.nombre }}</option>
+                                  
+
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Nuevo precio</label>
+                            <input type="text"
+                                name="precio_actual"
+                                class="form-control"
+                                required>
+                        </div>
+
+                        <select name="estado" id
+                            class="form-control">
+                            <option value="1">Activo</option>
+                            <option value="2">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn
+                                btn-default"
+                            data-dismiss="modal"
+                            value="Cancel">
+                        <input type="submit" class="btn
+                                btn-success" value="Asignar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% for productos in Precios %}
+    <!-- Edit Modal HTML -->
+    <div id="modal-default{{productos.id}}" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form
+                    action="/actualizar_precio_servicio/{{productos.id}}"
+                    method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Editar precios</h4>
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Producto: </label>
+                            <input type="text"
+                                value="{{productos.id_servicios}}"
+                                hidden>
+                            <input type="text"
+                                class="form-control"
+                                value="{{productos.servicio.nombre}}"
+                                disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nuevo precio</label>
+                            <input type="number"
+                                name="precio_actual"
+                                class="form-control">
+                            <input type="number"
+                                name="precio_anterior"
+                                class="form-control"
+                                value="{{productos.precio_actual}}"
+                                hidden>
+                        </div>
+
+                        <div class="form-group">
+                            <select name="estado" id
+                                class="form-control">
+                                <option value="1" {% if
+                                    productos.estado ==
+                                    1 %}selected{% endif %}>Activo</option>
+                                <option value="2" {% if
+                                    productos.estado ==
+                                    2 %}selected{% endif %}>Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn
+                                btn-default"
+                            data-dismiss="modal"
+                            value="Cancel">
+                        <input type="submit" class="btn
+                                btn-info" value="Save">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% for productos in Precios %}
+    <div id="modal-danger{{productos.id}}" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <form action="/eliminar_precio_servicio" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Eliminar producto</h4>
+
+                        <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="number" name="id"
+                            value="{{ productos.id }}" hidden>
+
+                        <p>Estas seguro que quieres eliminar el producto</p>
+                     
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn
+                                btn-default"
+                            data-dismiss="modal"
+                            value="Cancel">
+                            <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!---footer---->
+
+</section>
+{% endblock %}

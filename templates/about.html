@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" type="image/png" href="/static/img/2.png">
+		<title>Luxx Art</title>
+		<link rel="stylesheet" type="text/css" href="/static/css/style2.css">
+
+		<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+			rel="stylesheet">
+
+		<link rel="stylesheet"
+			href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+			rel="stylesheet">
+
+	</head>
+	<body>
+
+		<!----header section design---->
+		<header>
+			<a href="#" class="logo"><img src="/static/img/5.png"></a>
+
+			<ul class="navbar">
+				<li><a href="/">Inicio</a></li>
+				<li><a href="/acerca" class="active">Acerca</a></li>
+				<li><a href="/shop">Productos</a></li>
+			</ul>
+
+			<div class="icons">
+
+				<div class="icons">
+					{% if 'cliente_foto' in session %}
+					<a href class="foto"><img
+						src="/static/img/imagenes/{{session['cliente_foto']}}" class="foto" alt></a>
+					{% else %}
+					<a href="/login"><i class="ri-user-line"></i></a>
+					{% endif %}
+	
+					<a href="/card"><i class="ri-shopping-cart-line"></i></a>
+					<div class="bx bx-menu" id="menu-icon"></div>
+				</div>
+			</div>
+		</header>
+
+		<!----cta section design---->
+		<section class="cta-content">
+			<div class="cta">
+				<div class="cta-text">
+					<a href="#" class="logo"><img src="/static/img/2.png" style="width: 10%;"></a>
+
+				</div>
+			</div>
+		</section>
+		<!----cta section design---->
+		<section class="cta-content">
+			<div class="cta2">
+				<div class="cta-text">
+					<a href="#" class="logo"><img src="/static/img/2.png" style="width: 10%;"></a>
+
+				</div>
+			</div>
+		</section>
+
+		<!----contact section design---->
+		<section class="contact">
+			<div class="main-contact">
+				<div class="contact-content">
+					<h5>Navegacion</h5>
+					<ul>
+						<li><a href="/">Inicio</a></li>
+						<li><a href="/acerca">Acerca de</a></li>
+						<li><a href="/producto">Productos</a></li>
+						{% if 'cliente_id' in session %}
+						<li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+						{% endif %}
+					</ul>
+				</div>
+
+				<div class="contact-content">
+					<h5>Redes sociales</h5>
+					<ul>
+						<li><a href="https://www.instagram.com/luxx.art.cfts/" target="_blank">Instragram</a></li>
+						<li><a href="https://www.facebook.com/gomez.1624" target="_blank">Facebook</a></li>
+						<li><a href>Whatsapp</a></li>
+
+					</ul>
+
+				</div>
+
+				<div class="contact-content">
+					<h5>Politicas y privacidad</h5>
+					<ul>
+						<li><a href="#">Politicas y privacidad</a></li>
+						<li><a href="#">Termino y condiciones</a></li>
+						<li><a href="#">Cokies</a></li>
+
+					</ul>
+
+				</div>
+
+			</div>
+		</section>
+
+		<div class="end-text">
+			<p>© 2023 All Rights Reserved by Luxx ART</p>
+		</div>
+
+		<script src="https://unpkg.com/scrollreveal"></script>
+
+		<!---custom js link--->
+		<script type="text/javascript"
+		src="{{url_for('static', filename= 'js/script.js')}}"></script>
+
+
+	</body>
+</html>

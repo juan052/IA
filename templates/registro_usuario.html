@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="/static/img/2.png">
+        <title>Luxx Art ||Registro de usuarios</title>
+        <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    <script
+        src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+        <link rel="stylesheet" href="/static/css/resgistro.css">
+    </head>
+    <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <script>
+              Swal.fire(
+                '{{ category }}!',
+                '{{ message }}',
+                '{{ category.lower() }}'
+              );
+            </script>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+  
+        <div class="content">
+
+            <br>
+            <br>
+            <h1 class="logo"></h1>
+
+            <div class="animated bounceInUp">
+                <div class="login-box"> <!-- cambiar es registro -->
+                    <img src="/static/img/5.png" class="avatar"
+                        alt="Avatar Image">
+
+                </div>
+                <div class="contact-form">
+                    <br>
+                    <!-- registro.html -->
+
+                    <!-- Resto del contenido del formulario -->
+
+                    <h3 style="margin-left: 40%; margin-top: 3%;">Registro de
+                        usuario</h3>
+                    <form action="/registrase"  method="post"  enctype="multipart/form-data">
+                        <p>
+                            <label>Nombre :</label>
+                            <input type="text" name="nombre" id="nombre"
+                                required>
+                        </p>
+                        <p>
+                            <label>Apellido</label>
+                            <input type="text" name="apellido" id="apellido"
+                                required>
+                        </p>
+                        <p>
+                            <label>Telefono</label>
+                            <input type="number" name="telefono" id="telefono"
+                                required>
+                        </p>
+                        <p>
+                            <label>Cedula:</label>
+                            <input type="text" name="cedula" id="cedula"
+                                required>
+                        </p>
+                        <p>
+                            <label>Fecha de nacimiento:</label>
+                            <input type="date" name="fecha" id="fecha" required>
+                        </p>
+                        <p>
+                            <label>Genero</label>
+                            <select name="genero" id="genero" required>
+                                <option value="F">Femenino</option>
+                                <option value="M">Masculino</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label>Foto:</label>
+                            <input type="file" name="foto"  accept=".png, .jpg, .jpeg">
+                        </p>
+                        <p>
+                            <label>Correo Electronico: </label>
+                            <input type="email" name="email" id="email" required>
+                        </p>
+                        <p>
+                            <label>Contraseña: </label>
+                            <input type="password" name="contraseña" required>
+                        </p>
+                        <p class="block">
+                            <label>Direccion: </label>
+                            <textarea name="Direccion" rows="3" required></textarea>
+                        </p>
+                        <p class="block">
+                            <button type="submit">
+                                Registrar
+                            </button>
+                        </p>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+        <script>
+            function validarFormulario(event) {
+                event.preventDefault(); // Evita el envío del formulario si hay errores
+    
+                var nombre = document.getElementById("nombre").value;
+                // Resto de las variables
+    
+                var errores = [];
+    
+                // Validar campos vacíos y realizar las validaciones adicionales
+    
+                if (errores.length > 0) {
+                    alert(errores.join("\n"));
+                    return false;
+                }
+    
+                // Si no hay errores, puedes enviar el formulario
+                document.getElementById("crear").submit();
+    
+                return true;
+            }
+        </script>
+    </body>
+</html>
