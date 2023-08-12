@@ -72,7 +72,7 @@
                                     <td>{{ trabajadores.persona.direccion }}</td>
                                     <td>{{ trabajadores.persona.celular }}</td>
                                     <th> <img
-                                            src="/static/img/imagenes/{{trabajadores.foto}}"
+                                            src="{{trabajadores.foto}}"
                                             alt width="50"></th>
                                     <td>
                                         {% if trabajadores.estado == 1 %}
@@ -308,15 +308,14 @@
                                 <div class="col-md-4">
                                     {% if productos.foto %}
                                     <label>Foto anterior</label>
-                                    <img src="{{ url_for('static',
-                                            filename='img/imagenes/' + productos.foto)
+                                    <img src="{{ productos.foto
                                             }}" alt="Foto actual" width="20">
                                     {% endif %}
         
                                     <label>Foto nueva</label>
                                     <input type="file" name="foto"
                                         class="form-control"
-                                        value="/static/img/imagenes/{{productos.foto}}">
+                                        value="">
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">

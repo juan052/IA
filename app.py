@@ -53,45 +53,28 @@ db.init_app(app)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db_session = scoped_session(sessionmaker(bind=engine))
-# Subir foto al servidor
-@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['file']
-    if file:
-        filename = secure_filename(file.filename)
-        result = cloudinary.uploader.upload(file)
-        return result["secure_url"]
-    else:
-        return 'No se proporcionó ningún archivo'
-
-    
 
 # Inicio
 @app.route("/")
 def index():
     usuario = session.get('cliente_id')
     if usuario is None:
-        # La sesión no existe
-        # Realiza alguna acción o redirige a otra página
-        Precios = Precio.query.options(joinedload(Precio.producto)).limit(4).all()
+        Precios = Precio.query.options(joinedload(Precio.producto)).limit(3).all()
         return render_template('index.html', Precios=Precios)
     else:
-        # La sesión existe
-        Precios = Precio.query.options(joinedload(Precio.producto)).limit(4).all()
+        Precios = Precio.query.options(joinedload(Precio.producto)).limit(3).all()
         return render_template('index.html', Precios=Precios, usuario=usuario)
 
 @app.route("/home")
 def home():
     usuario = session.get('cliente_id')
     if usuario is None:
-        # La sesión no existe
-        # Realiza alguna acción o redirige a otra página
-        Precios = Precio.query.options(joinedload(Precio.producto)).limit(4).all()
+        Precios = Precio.query.options(joinedload(Precio.producto)).limit(3).all()
         return render_template('index.html', Precios=Precios)
     else:
-        # La sesión existe
-        Precios = Precio.query.options(joinedload(Precio.producto)).limit(4).all()
+        Precios = Precio.query.options(joinedload(Precio.producto)).limit(3).all()
         return render_template('index.html', Precios=Precios, usuario=usuario)
+    
 @app.route("/logout")
 def logout():
       # Borrar toda la sesión
@@ -130,7 +113,7 @@ def shop():
         return render_template('shop.html', Precios=Precios,usuario=usuario, cantidad=cantidad, confirmar=confirmar)
     
    
-
+#Gestion de productos
 @app.route("/categoria")
 @login_required
 def categoria():
@@ -265,12 +248,11 @@ def producto_crear():
             logo = request.files['foto']
             print(logo)
             if logo:
-                # Upload the image to Cloudinary without saving it to a local folder.
-                # Cloudinary will create a unique name for the image.
-                result = cloudinary.uploader.upload(logo)
+                
+                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
                 secure_url = result["secure_url"]
               
-        print(secure_url)
+     
         producto=Producto(id_sub_categoria=id_sub_categoria, nombre=nombre, descripcion=descripcion, cantidad=cantidad,logo=secure_url, estado=estado)
         db.session.add(producto)
         db.session.commit()
@@ -297,28 +279,39 @@ def producto_actualizar(producto_id):
         if 'foto' in request.files:
             nueva_logo = request.files['foto']
             if nueva_logo:
-                # Eliminar la imagen anterior si existe
-                if logo:
-                    eliminar_logo_antigua(logo)
-                
-                # Guardar la nueva imagen
-                filename = str(uuid.uuid4()) + secure_filename(nueva_logo.filename)
-                nueva_logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                try:
+                        if logo:
+                            # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                            public_id_anterior = logo.split('/')[-1].split('.')[0]
+                            # Intenta eliminar la imagen anterior de Cloudinary
+                            try:
+                                cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                            except cloudinary.exceptions.Error as delete_error:
+                                print(f"Error al eliminar la imagen anterior: {delete_error}")
+
+                        # Subir y transformar la nueva imagen
+                        result = cloudinary.uploader.upload(nueva_logo,transformation={"width": 300, "height": 300})
+                        secure_url = result["secure_url"]
+                except cloudinary.exceptions.Error as upload_error:
+                    flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
+                    return redirect(url_for('producto'))
 
         producto.id_sub_categoria = id_sub_categoria
         producto.nombre = nombre
         producto.descripcion = descripcion
         producto.cantidad = cantidad
-        producto.logo = logo
+        producto.logo = secure_url if 'secure_url' in locals() else logo
         producto.estado = estado
 
-        db.session.commit()
-        flash("Se ha actualizado el producto","success")
-        return redirect(url_for('producto'))
-    else:
-        flash("No se ha actualizado el producto","error")
-        return redirect(url_for('producto'))
+        try:
+            db.session.commit()
+            flash("Se ha actualizado el producto", "success")
+        except Exception as db_error:
+            db.session.rollback()
+            flash("Error al actualizar el producto: {}".format(str(db_error)), "error")
+        
+    return redirect(url_for('producto'))
+
 
 @app.route("/eliminar_producto", methods=["POST"])
 @login_required
@@ -336,10 +329,7 @@ def eliminar_producto():
     return redirect(url_for('producto'))
 
 
-def eliminar_logo_antigua(filename):
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(path):
-        os.remove(path)
+
 
 
 @app.route("/precio_producto",methods=["POST","GET"])
@@ -433,12 +423,10 @@ def crear_trabajador():
         logo = None
         if 'foto' in request.files:
             logo = request.files['foto']
-            print(logo)
+            
             if logo:
-                filename = str(uuid.uuid4()) + secure_filename(logo.filename)
-                logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
-        print(logo)
+                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+                secure_url = result["secure_url"]
         persona=Persona(nombre=nombre,correo=correo,direccion=direccion,celular=celular)
         db.session.add(persona)
         db.session.commit()
@@ -446,7 +434,7 @@ def crear_trabajador():
         personanat=PersonaNatural(id_persona=id_persona,apellido=apellido,cedula=cedula,fecha_nacimiento=fecha,genero=genero)
         db.session.add(personanat)
         db.session.commit()
-        colaborador=Trabajador(id_persona=id_persona,foto=logo,estado=estado)
+        colaborador=Trabajador(id_persona=id_persona,foto=secure_url,estado=estado)
         db.session.add(colaborador)
         db.session.commit()
         flash("Se ha agreado correctamente el colaborador","success")
@@ -477,15 +465,23 @@ def actualizar_trabajador(id):
          
         if 'foto' in request.files:
             archivo_foto = request.files['foto']
-            if archivo_foto:
-                # Eliminar el archivo de foto actual si existe
-                if logo:
-                    eliminar_logo_antigua(logo)
+            
+            try:
+                    if logo:
+                            # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                        public_id_anterior = logo.split('/')[-1].split('.')[0]
+                            # Intenta eliminar la imagen anterior de Cloudinary
+                        try:
+                                cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                        except cloudinary.exceptions.Error as delete_error:
+                            print(f"Error al eliminar la imagen anterior: {delete_error}")
 
-                # Guardar el nuevo archivo de foto
-                filename = str(uuid.uuid4()) + secure_filename(archivo_foto.filename)
-                archivo_foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                        # Subir y transformar la nueva imagen
+                    result = cloudinary.uploader.upload(archivo_foto,transformation={"width": 300, "height": 300})
+                    secure_url = result["secure_url"]
+            except cloudinary.exceptions.Error as upload_error:
+                flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
+                redirect(url_for('trabajador'))
 
         persona.nombre = nombre
         persona.correo = correo
@@ -493,11 +489,7 @@ def actualizar_trabajador(id):
         persona.celular = celular
         db.session.add(persona)
         db.session.commit()
-        print(apellido)
-        print(cedula)
-        print(fecha)
-        print(genero)
-        
+
         personanat.apellido = apellido
         personanat.cedula = cedula
         personanat.fecha_nacimiento = fecha
@@ -505,7 +497,7 @@ def actualizar_trabajador(id):
         db.session.add(personanat)
         db.session.commit()
 
-        trabajador.foto = logo
+        trabajador.foto = secure_url
         trabajador.estado = estado
         db.session.add(trabajador)
         db.session.commit()
@@ -1012,9 +1004,8 @@ def registrase():
         if 'foto' in request.files:
             logo = request.files['foto']
             if logo:
-                filename = str(uuid.uuid4()) + secure_filename(logo.filename)
-                logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+                secure_url = result["secure_url"]
         
         
         usuario_existente = Usuario.query.filter_by(usuario=email).first()
@@ -1030,7 +1021,7 @@ def registrase():
         hashed_password = generate_password_hash(contraseña)
         usuario = Usuario(id_grupo=2, id_persona=persona.id, usuario=email, contraseña=hashed_password, estado=1)
         persona.usuario = usuario
-        cliente = Cliente(id_persona=persona.id, tipo_cliente="Normal", foto=logo, estado=1)
+        cliente = Cliente(id_persona=persona.id, tipo_cliente="Normal", foto=secure_url, estado=1)
         persona.cliente = cliente
         db.session.add(usuario)
         db.session.add(cliente)
@@ -1132,12 +1123,11 @@ def crear_servicios():
     if 'foto' in request.files:
         logo = request.files['foto']
         if logo:
-            filename = str(uuid.uuid4()) + secure_filename(logo.filename)
-            logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            logo = filename
+           result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+           secure_url = result["secure_url"]
     estado = request.form.get('estado')
 
-    servicio = Servicio(nombre=nombre, descripcion=descripcion, foto=logo, estado=estado)
+    servicio = Servicio(nombre=nombre, descripcion=descripcion, foto=secure_url, estado=estado)
     db.session.add(servicio)
     db.session.commit()
     flash("Se ha creado correctamente el servicios","success")
@@ -1157,18 +1147,27 @@ def actualizar_servicio(servicio_id):
             nueva_logo = request.files['foto']
             if nueva_logo:
                 # Eliminar la imagen anterior si existe
-                if logo:
-                    eliminar_logo_antigua(logo)
-                
-                # Guardar la nueva imagen
-                filename = str(uuid.uuid4()) + secure_filename(nueva_logo.filename)
-                nueva_logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                try:
+                        if logo:
+                                # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                            public_id_anterior = logo.split('/')[-1].split('.')[0]
+                                # Intenta eliminar la imagen anterior de Cloudinary
+                            try:
+                                    cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                            except cloudinary.exceptions.Error as delete_error:
+                                print(f"Error al eliminar la imagen anterior: {delete_error}")
+
+                            # Subir y transformar la nueva imagen
+                        result = cloudinary.uploader.upload(nueva_logo,transformation={"width": 300, "height": 300})
+                        secure_url = result["secure_url"]
+                except cloudinary.exceptions.Error as upload_error:
+                    flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
+                    return redirect('/servicios')  
 
         servicio.nombre = nombre
         servicio.descripcion = descripcion
         servicio.estado = estado
-        servicio.foto=logo
+        servicio.foto=secure_url
         db.session.commit()
         flash("Se ha actualizado correctamente el servicios","success")
         return redirect('/servicios')
@@ -1648,13 +1647,9 @@ def crear_venta_pedido():
         costo_total=request.form.get('costo_total')
         descuento=request.form.get('descuento')
         ultima_venta = Venta.query.order_by(Venta.id.desc()).first()
-        print(ultima_venta)
         fecha_actual = date.today()
         total  = int(costo_total) - int(descuento)
-        print(id)
         pedido=Personalizacion.query.get(id)
-        print("------------------------------------------")
-        print(pedido)
         pedido.estado=6
         db.session.add(pedido)
         db.session.commit()
@@ -1742,6 +1737,3 @@ def anular():
     
     return redirect('ventas')
 
-#if __name__ == '__main__':
-    #app.run(host='0.0.0.0')
-    #app.run(debug=True)

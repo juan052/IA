@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\jrios\OneDrive\Documentos\Semestre\Aplicaciones_graficas\proyecto_aplicaciones_graficas\env"
+VIRTUAL_ENV="C:\Users\jrios\Documents\github\IA\env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

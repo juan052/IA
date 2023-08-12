@@ -225,8 +225,7 @@
 
                             {% if productos.logo %}
                             <label>Foto anterior</label>
-                            <img src="{{ url_for('static',
-                                    filename='img/imagenes/' + productos.logo)
+                            <img src="{{ productos.logo
                                     }}" alt="Foto actual" width="50">
                             {% endif %}
 
