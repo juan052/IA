@@ -36,12 +36,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SESSION_PERMANENT"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['UPLOAD_FOLDER'] = 'static/img/imagenes'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'ingsoftwar123@gmail.com'
-app.config['MAIL_PASSWORD'] = 'uwyzadkpqxkxzhvr'
+app.config['MAIL_PASSWORD'] = 'xishvjfvtnrabdpj'
 app.secret_key = 'tu_clave_secreta'
 account_sid = 'AC4758eb208264635a3c58aa454bd39dde'
 auth_token = '5795809fa88e649a310bd23103afbbd0'
@@ -95,22 +94,27 @@ def acerca():
         
         return render_template('about.html', usuario=usuario)
 
-@app.route("/shop")
-def shop():
+@app.route("/contacto")
+def contacto():
     usuario = session.get('cliente_id')
     if usuario is None:
         # La sesión no existe
         # Realiza alguna acción o redirige a otra página
-        Precios = Precio.query.options(joinedload(Precio.producto)).all()
-        return render_template('index.html', Precios=Precios)
+        return render_template('contacto.html')
     else:
         # La sesión existe
-        Precios = Precio.query.join(Precio.producto).filter(Producto.cantidad > 0).options(joinedload(Precio.producto)).all()
-        cliente_id = session.get('cliente_id')
-        cantidad = Personalizacion.query.filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).count()
-        confirmar = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).all()
         
-        return render_template('shop.html', Precios=Precios,usuario=usuario, cantidad=cantidad, confirmar=confirmar)
+        return render_template('contacto.html', usuario=usuario)
+
+@app.route("/shop")
+def shop():
+    usuario = session.get('cliente_id')
+    Precios = Precio.query.join(Precio.producto).filter(Producto.cantidad > 0).options(joinedload(Precio.producto)).all()
+    cliente_id = session.get('cliente_id')
+    cantidad = Personalizacion.query.filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).count()
+    confirmar = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).all()
+    
+    return render_template('shop.html', Precios=Precios, usuario=usuario, cantidad=cantidad, confirmar=confirmar)
     
    
 #Gestion de productos
@@ -1737,3 +1741,27 @@ def anular():
     
     return redirect('ventas')
 
+
+@app.route('/enviar_correo',methods=['GET','POST'])
+def enviar_correo():
+    nombre=request.form.get('nombre')
+    correo=request.form.get('correo')
+    mensaje=request.form.get('mensaje')
+     # Crear el mensaje de correo
+    subject = "Formulario de Contacto"
+    message_body = f"Nombre: {nombre}\nCorreo: {correo}\nMensaje: {mensaje}"
+
+    msg = Message(subject, sender=(correo, nombre), recipients=['ingsoftwar123@gmail.com'])
+    msg.body = message_body
+    print(msg)
+   
+        # Enviar el correo
+    try:
+        mail.send(msg)
+        flash("Se ha enviado el correo","success")
+        return redirect('/contacto')
+    except Exception as e:
+        print( "Error al enviar el correo: " + str(e))
+        flash("No se pudo enviar el correo","error")
+        return redirect('/contacto')
+    

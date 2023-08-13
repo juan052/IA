@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- ===============================================-->
+    <!--    Document Title-->
+    <!-- ===============================================-->
+    <title>Luxx Art{% block title %}{% endblock %}</title>
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="static/img/5.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/img/5.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/img/5.png ">
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/5.png>
+	<link rel=" manifest" href="assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="static/img/5.png>
+	<meta name=" theme-color" content="#ffffff">
+
+
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <!-- ===============================================-->
+    <link href="static/assets/css/theme.css" rel="stylesheet" />
+
+</head>
+
+
+<body>
+    <style>
+        .colored-toast.swal2-icon-success {
+            background-color: #a5dc86 !important;
+        }
+
+        .colored-toast.swal2-icon-error {
+            background-color: #f27474 !important;
+        }
+
+        .colored-toast.swal2-icon-warning {
+            background-color: #f8bb86 !important;
+        }
+    </style>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-right',
+            iconColor: 'white',
+            customClass: {
+                popup: 'colored-toast'
+            },
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true
+        });
+
+        '{% for category, message in messages %}'
+        Toast.fire({
+            icon: '{{ category }}',
+            title: '{{ message }}'
+        });
+        '{% endfor %}'
+    </script>
+    {% endif %}
+    {% endwith %}
+    <main class="main" id="top">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top py-5 d-block"
+            data-navbar-on-scroll="data-navbar-on-scroll" style="margin-top: 0%;">
+            <div class="container"><a class="navbar-brand" href="/"><img src="/static/img/2.png" height="70"
+                        alt="logo" /></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon">
+                    </span></button>
+                <div class="collapse navbar-collapse border-top border-lg-0 mt-4 mt-lg-0" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto pt-2 pt-lg-0 font-base align-items-lg-center align-items-start">
+                        <li class="nav-item px-3 px-xl-4"><a class="nav-link fw-medium" aria-current="page"
+                                href="/home">Inicio</a></li>
+                        <li class="nav-item dropdown px-3 px-lg-0"> <a
+                                class="d-inline-block ps-0 py-2 pe-3 text-decoration-none dropdown-toggle fw-medium"
+                                href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">Paginas</a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius:0.3rem;"
+                                aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/acerca">Acerca de</a></li>
+                                <li><a class="dropdown-item" href="/contacto">Contacto</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item px-3 px-xl-4"><a class="nav-link fw-medium" aria-current="page"
+                                href="/shop">Productos</a></li>
+
+                        {% if 'cliente_foto' in session %}
+                        <li class="nav-item dropdown px-3 px-lg-0"> <a
+                                class="d-inline-block ps-0 py-2 pe-3 text-decoration-none dropdown-toggle fw-medium"
+                                href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false"><img src="{{session['cliente_foto']}}"
+                                    class="round-btn-lg rounded-circle me-3 shadow" width="50">{{
+                                session["cliente_nombre"] }}</a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius:0.3rem;"
+                                aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#!">Perfil</a></li>
+                                <li><a class="dropdown-item" href="#!">Pedidos</a></li>
+                                <li><a href="" class="dropdown-item">Asistente</a></li>
+                                <li><a href="/logout" class="dropdown-item">Logout</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+
+                        <li class="nav-item px-3 px-xl-4"><a class="nav-link fw-medium" aria-current="page"
+                                href="/login">Login</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        {% block main %}
+        <!-- Contenido específico de la página -->
+        {% endblock %}
+
+        <section class="pb-0 pb-lg-4">
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-7 col-12 mb-4 mb-md-6 mb-lg-0 order-0"> <img class="mb-4"
+                            src="/static/img/5.png" width="150" alt="jadoo" />
+                        <p class="fs--1 text-secondary mb-0 fw-medium">Book your trip in minute, get full Control for
+                            much longer.</p>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-1 order-md-2">
+                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Company</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">About</a>
+                            </li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="#!">Careers</a></li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="#!">Mobile</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-2 order-md-3">
+                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Contacto</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Ayuda</a>
+                            </li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Politicas
+                                    de privacidad</a>
+                            </li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="#!">Affiliate</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-3 order-md-4">
+                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Mas</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="#!">Airlinefees</a></li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="#!">Airline</a></li>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Low fare
+                                    tips</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-5 col-12 mb-4 mb-md-6 mb-lg-0 order-lg-4 order-md-1">
+                        <div class="icon-group mb-4"> <a class="text-decoration-none icon-item shadow-social"
+                                id="facebook" href="#!"><i class="fab fa-facebook-f"> </i></a><a
+                                class="text-decoration-none icon-item shadow-social" id="instagram" href="#!"><i
+                                    class="fab fa-instagram"> </i></a><a
+                                class="text-decoration-none icon-item shadow-social" id="twitter" href="#!"><i
+                                    class="fab fa-twitter"> </i></a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- <section> close ============================-->
+        <!-- ============================================-->
+
+
+        <div class="py-5 text-center">
+            <p class="mb-0 text-secondary fs--1 fw-medium">Todos los derechos reservados</p>
+        </div>
+    </main>
+    <!-- ===============================================-->
+    <!--    End of Main Content-->
+    <!-- ===============================================-->
+
+
+
+
+    <!-- ===============================================-->
+    <!--    JavaScripts-->
+    <!-- ===============================================-->
+    <script src="{{ url_for('static', filename='vendors/@popperjs/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/bootstrap/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/is/is.min.js') }}"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>
+    <script src="{{ url_for('static', filename='vendors/fontawesome/all.min.js') }}"></script>
+    <!-- Enlace a theme.js -->
+    <script src="{{ url_for('static', filename='assets/js/theme.js') }}"></script>
+
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Volkhov:wght@700&amp;display=swap"
+        rel="stylesheet">
+</body>
+
+</html>
