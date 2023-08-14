@@ -1280,9 +1280,8 @@ def crear_cliente():
         if 'foto' in request.files:
             logo = request.files['foto']
             if logo:
-                filename = str(uuid.uuid4()) + secure_filename(logo.filename)
-                logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+                secure_url = result["secure_url"]
         
         
      
@@ -1300,7 +1299,7 @@ def crear_cliente():
 
       
         # Crear una instancia de Cliente y asociarla a Persona
-        cliente = Cliente(id_persona=persona.id, tipo_cliente=tipo, foto=logo, estado=1)
+        cliente = Cliente(id_persona=persona.id, tipo_cliente=tipo, foto=secure_url, estado=1)
         persona.cliente = cliente
 
         # Agregar los objetos a la sesión de la base de datos y confirmar los cambios
@@ -1337,15 +1336,24 @@ def actualizar_cliente(id):
         if 'foto' in request.files:
             archivo_foto = request.files['foto']
             if archivo_foto:
-                # Eliminar el archivo de foto actual si existe
-                if logo:
-                    eliminar_logo_antigua(logo)
+                try:
+                    if logo:
+                                # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                        public_id_anterior = logo.split('/')[-1].split('.')[0]
+                                # Intenta eliminar la imagen anterior de Cloudinary
+                        try:
+                                cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                        except cloudinary.exceptions.Error as delete_error:
+                                print(f"Error al eliminar la imagen anterior: {delete_error}")
 
-                # Guardar el nuevo archivo de foto
-                filename = str(uuid.uuid4()) + secure_filename(archivo_foto.filename)
-                archivo_foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                logo = filename
+                            # Subir y transformar la nueva imagen
+                        result = cloudinary.uploader.upload(archivo_foto,transformation={"width": 300, "height": 300})
+                        secure_url = result["secure_url"]
+                except cloudinary.exceptions.Error as upload_error:
+                    flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
+                    return redirect('/servicios')  
 
+                    
        
         # Actualizar los datos del cliente existente
         cliente.persona.nombre = nombre
@@ -1357,7 +1365,7 @@ def actualizar_cliente(id):
         cliente.persona.persona_natural.fecha_nacimiento = fecha_nacimiento
         cliente.persona.persona_natural.genero = genero
         cliente.tipo_cliente = tipo
-        cliente.foto = logo
+        cliente.foto = secure_url
         cliente.estado=estado
         db.session.add(cliente)
         db.session.commit()
@@ -1398,33 +1406,39 @@ def eliminar_cliente():
 
 @app.route('/personalizacion', methods=['POST'])
 def personalizacion():
-    cliente_id = request.form.get('cliente_id')
-    descripcion = request.form.get('descripcion')
-    presupuesto = request.form.get('presupuesto')
-    foto = request.files['foto']
+    if  request.method  == 'POST': 
+        cliente_id = request.form.get('cliente_id')
+        descripcion = request.form.get('descripcion')
+        presupuesto = request.form.get('presupuesto')
+        foto = request.files['foto']
 
-    print(f'Cliente ID: {cliente_id}')
-    print(f'Descripción: {descripcion}')
-    print(f'Presupuesto: {presupuesto}')
-    print(f'Foto: {foto.filename}')
+        print(f'Cliente ID: {cliente_id}')
+        print(f'Descripción: {descripcion}')
+        print(f'Presupuesto: {presupuesto}')
+        print(f'Foto: {foto.filename}')
 
-    logo = None
-    if 'foto' in request.files:
-        logo = request.files['foto']
-        if logo:
-            filename = str(uuid.uuid4()) + secure_filename(logo.filename)
-            logo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            logo = filename
+        logo = None
+        if 'foto' in request.files:
+            logo = request.files['foto']
+            if logo:
+                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+                secure_url = result["secure_url"]
+        
+        personalizacion=Personalizacion(id_cliente=cliente_id,descripcion=descripcion,fotos=secure_url,presupuesto=presupuesto,estado=0)
+        db.session.add(personalizacion)
+        db.session.commit()
+        return jsonify({
+            'descripcion': descripcion,
+            'presupuesto': presupuesto,
+            'cliente_id': cliente_id,
+            # Agrega aquí los demás campos que desees devolver
+        })
     
-    personalizacion=Personalizacion(id_cliente=cliente_id,descripcion=descripcion,fotos=logo,presupuesto=presupuesto,estado=0)
-    db.session.add(personalizacion)
-    db.session.commit()
     return jsonify({
-        'descripcion': descripcion,
-        'presupuesto': presupuesto,
-        'cliente_id': cliente_id,
-        # Agrega aquí los demás campos que desees devolver
-    })
+            'No hay accesso':'404'
+            # Agrega aquí los demás campos que desees devolver
+        })
+    
 
 
 
