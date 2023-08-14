@@ -22,5 +22,5 @@ Werkzeug==2.2.3
 Gunicorn
 Flask-Mail
 twilio
-cloudinary==1.33.0
+cloudinary==1.26.5
 
