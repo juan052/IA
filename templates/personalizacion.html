@@ -148,9 +148,7 @@
                                                             class="dropdown-menu">
                                                             <a
                                                                 class="dropdown-item"
-                                                              href="{{ url_for('static',
-                                                              filename='img/imagenes/' + categoria.personalizacion.fotos)
-                                                              }}" download>Descargar imagen</a>
+                                                              href="{{categoria.personalizacion.fotos}}" download>Descargar imagen</a>
                                                             <a
                                                                 class="dropdown-item"
                                                                 href="#modal-default1{{categoria.id}}"
@@ -280,9 +278,7 @@
                                             </td>
                                             <td>
                                                 <img
-                                                    src="{{ url_for('static',
-                                                filename='img/imagenes/' + categoria.personalizacion.fotos)
-                                                }}" alt="Foto actual"
+                                                    src="{{categoria.personalizacion.foto}}" alt="Foto actual"
                                                     width="50" alt>
                                             </td>
                                         </tr>

@@ -1406,7 +1406,7 @@ def eliminar_cliente():
 
 @app.route('/personalizacion', methods=['POST'])
 def personalizacion():
-    if  request.method  == 'POST': 
+    if request.method == "POST":
         cliente_id = request.form.get('cliente_id')
         descripcion = request.form.get('descripcion')
         presupuesto = request.form.get('presupuesto')
@@ -1418,7 +1418,7 @@ def personalizacion():
         print(f'Foto: {foto.filename}')
 
         logo = None
-        if 'foto' in request.files:
+        if 'foto' in request.files: 
             logo = request.files['foto']
             if logo:
                 result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
@@ -1434,10 +1434,7 @@ def personalizacion():
             # Agrega aquí los demás campos que desees devolver
         })
     
-    return jsonify({
-            'No hay accesso':'404'
-            # Agrega aquí los demás campos que desees devolver
-        })
+    return redirect('/shop')
     
 
 
