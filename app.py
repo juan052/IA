@@ -1004,7 +1004,7 @@ def registrase():
         email = request.form.get("email")
         contraseña = request.form.get("contraseña")
         direccion = request.form.get("Direccion")
-        logo = None
+        secure_url = None
         if 'foto' in request.files:
             logo = request.files['foto']
             if logo:
@@ -1420,10 +1420,9 @@ def personalizacion():
         logo = None
         if 'foto' in request.files: 
             logo = request.files['foto']
-            if logo:
-                result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
-                secure_url = result["secure_url"]
-        
+            result = cloudinary.uploader.upload(logo ,transformation={"width": 300, "height": 300})
+            secure_url = result["secure_url"]
+
         personalizacion=Personalizacion(id_cliente=cliente_id,descripcion=descripcion,fotos=secure_url,presupuesto=presupuesto,estado=0)
         db.session.add(personalizacion)
         db.session.commit()

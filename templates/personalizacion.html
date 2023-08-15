@@ -278,7 +278,7 @@
                                             </td>
                                             <td>
                                                 <img
-                                                    src="{{categoria.personalizacion.foto}}" alt="Foto actual"
+                                                    src="{{categoria.personalizacion.fotos}}" alt="{{categoria.personalizacion.descripcion}}"
                                                     width="50" alt>
                                             </td>
                                         </tr>
@@ -337,8 +337,7 @@
                                             </td>
                                             <td>
                                                 <img
-                                                    src="{{ url_for('static',
-                                                filename='img/imagenes/' + categoria.fotos)
+                                                    src="{{categoria.fotos
                                                 }}" alt="Foto actual"
                                                     width="50" alt>
                                             </td>
@@ -406,16 +405,14 @@
         <div class="modal-dialog">
             <div class="modal-content  align-content-center">
                 
-                    <img src="{{ url_for('static',
-                    filename='img/imagenes/' + categoria.fotos)
+                    <img src="{{  categoria.fotos
                     }}" width="100%">
                
 
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-danger"
                         data-dismiss="modal">Cancelar</button>
-                    <a href="{{ url_for('static',
-                    filename='img/imagenes/' + categoria.fotos)
+                    <a href="{{ categoria.fotos
                     }}" class="btn btn-success" download>Guardar</a>
                 </div>
 
