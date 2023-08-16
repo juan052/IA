@@ -1,0 +1,178 @@
+{% extends "index_base.html" %}
+{% block title %} || Perfil{% endblock %}
+
+{% block main %}
+<section style="padding-top: 7rem;">
+    <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
+    </div>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{ cliente.foto }}" alt="avatar" class="rounded-circle img-fluid"
+                            style="width: 150px;">
+                        <h5 class="my-3">{{persona.nombre}}</h5>
+                        <p class="text-dark mb-4">{{persona.direccion}}</p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <button type="button" class="btn btn-outline-primary ms-1">Actualizar</button>
+                            <button type="button" class="btn btn-outline-primary ms-1">Cambiar contraseña</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Informacion Principal</h3>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="mb-0">Nombre</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <p class="text-dark mb-0">{{persona.nombre}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="mb-0">Correo</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <p class="text-dark mb-0">{{persona.correo}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="mb-0">Telefono || Celular </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <p class="text-dark mb-0">{{persona.celular}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="mb-0">Direccion</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <p class="text-dark mb-0">{{persona.direccion}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-12">
+                {% if persona_natural %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Informacion Complementaria</h3>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Apellido:</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_natural.apellido }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Cedula:</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_natural.cedula }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Fecha de nacimiento:</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_natural.fecha_nacimiento}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Genero</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_natural.genero }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Informacion Complementaria</h3>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Razon social:</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_juridica.razon_social }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Numero ruc:</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_juridica.ruc }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <p class="mb-0">Fecha constitucional </p>
+                            </div>
+                            <div class="col-sm-5">
+                                <p class="text-dark mb-0"> {{ persona_juridica.fecha_constitucional }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {% endif %}
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="card mb-4 mb-lg-0">
+                    <h2>Resumen de actividad</h2>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush rounded-3">
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0">https://mdbootstrap.com</p>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <i class="fab fa-github fa-lg" style="color: #333333;"></i>
+                                <p class="mb-0">mdbootstrap</p>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                                <p class="mb-0">@mdbootstrap</p>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                                <p class="mb-0">mdbootstrap</p>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                                <p class="mb-0">mdbootstrap</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -50,7 +50,7 @@
                 <div class="icons">
                     {% if 'cliente_foto' in session %}
                     <a href class="foto"><img
-                            src="/static/img/imagenes/{{session['cliente_foto']}}"
+                            src="{{session['cliente_foto']}}"
                             class="foto" alt></a>
                     {% else %}
                     <a href="/login"><i class="ri-user-line"></i></a>

@@ -102,7 +102,7 @@ body{
                 <div class="icons">
                     {% if 'cliente_foto' in session %}
                     <a href class="foto"><img
-                            src="/static/img/imagenes/{{session['cliente_foto']}}"
+                            src="{{session['cliente_foto']}}"
                             class="foto" alt></a>
                     {% else %}
                     <a href="/login"><i class="ri-user-line"></i></a>
@@ -184,7 +184,7 @@ body{
                     {% for item in carrito %}
                     <tr>
                         <td class="px-4 py-2">{{ item.nombre }}</td>
-                        <td class="px-4 py-2"><img src="/static/img/imagenes/{{ item.logo }}" alt width="50"></td>
+                        <td class="px-4 py-2"><img src="{{ item.logo }}" alt width="50"></td>
                         <td class="px-4 py-2">{{ item.cantidad }}</td>
                         <td class="px-4 py-2">{{ item.precio }}</td>
                         <td class="px-4 py-2"><span class="subtotal" id="subtotal{{ loop.index }}">{{ item.precio * item.cantidad }}</span></td>

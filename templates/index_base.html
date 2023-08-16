@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <!-- ===============================================-->
-    <link href="static/assets/css/theme.css" rel="stylesheet" />
+    <link href="/static/assets/css/theme.css" rel="stylesheet" />
 
 </head>
 
@@ -94,7 +94,10 @@
                         </li>
                         <li class="nav-item px-3 px-xl-4"><a class="nav-link fw-medium" aria-current="page"
                                 href="/shop">Productos</a></li>
-
+                        {% if 'cliente_foto' in session %}
+                        <li class="nav-item px-3 px-xl-4"><a class="nav-link fw-medium" aria-current="page"
+                                href="/card">Carrito</a></li>
+                        {% endif %}
                         {% if 'cliente_foto' in session %}
                         <li class="nav-item dropdown px-3 px-lg-0"> <a
                                 class="d-inline-block ps-0 py-2 pe-3 text-decoration-none dropdown-toggle fw-medium"
@@ -104,7 +107,7 @@
                                 session["cliente_nombre"] }}</a>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius:0.3rem;"
                                 aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#!">Perfil</a></li>
+                                <li><a class="dropdown-item" href="/perfil/{{session['cliente_id']}}">Perfil</a></li>
                                 <li><a class="dropdown-item" href="#!">Pedidos</a></li>
                                 <li><a href="" class="dropdown-item">Asistente</a></li>
                                 <li><a href="/logout" class="dropdown-item">Logout</a></li>
@@ -129,41 +132,38 @@
                 <div class="row">
                     <div class="col-lg-3 col-md-7 col-12 mb-4 mb-md-6 mb-lg-0 order-0"> <img class="mb-4"
                             src="/static/img/5.png" width="150" alt="jadoo" />
-                        <p class="fs--1 text-secondary mb-0 fw-medium">Book your trip in minute, get full Control for
-                            much longer.</p>
+                        <p class="fs--1 text-secondary mb-0 fw-medium">Somos un emprendimiento </p>
                     </div>
                     <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-1 order-md-2">
-                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Company</h4>
+                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Luxx Art</h4>
                         <ul class="list-unstyled mb-0">
-                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">About</a>
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="/home">Inicio</a>
                             </li>
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
-                                    href="#!">Careers</a></li>
+                                    href="/acerca">Acerca de</a></li>
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
-                                    href="#!">Mobile</a></li>
+                                    href="/contacto">Contacto</a></li>
                         </ul>
                     </div>
                     <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-2 order-md-3">
-                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Contacto</h4>
+                        <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Avisos legales</h4>
                         <ul class="list-unstyled mb-0">
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Ayuda</a>
                             </li>
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Politicas
                                     de privacidad</a>
                             </li>
-                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
-                                    href="#!">Affiliate</a></li>
+                           
                         </ul>
                     </div>
                     <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-3 order-md-4">
                         <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Mas</h4>
                         <ul class="list-unstyled mb-0">
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
-                                    href="#!">Airlinefees</a></li>
+                                    href="#!">Asistete virtual</a></li>
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
-                                    href="#!">Airline</a></li>
-                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="#!">Low fare
-                                    tips</a></li>
+                                    href="#!">Recomendaciones</a></li>
+
                         </ul>
                     </div>
                     <div class="col-lg-3 col-md-5 col-12 mb-4 mb-md-6 mb-lg-0 order-lg-4 order-md-1">

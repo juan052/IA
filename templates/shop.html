@@ -133,7 +133,6 @@
 </section>
 {% endif %}
 <section class="pt-5" id="destination">
-
 	<div class="container">
 		<div class="position-absolute start-100 bottom-0 translate-middle-x d-none d-xl-block ms-xl-n4"><img
 				src="static/assets/img/dest/shape.svg" alt="destination" /></div>
@@ -142,65 +141,70 @@
 			<h3 class="fs-xl-10 fs-lg-8 fs-7 fw-bold font-cursive text-capitalize">Nuestro productos</h3>
 		</div>
 		<div class="row">
-
 			{% for producto in Precios %}
-			<div class=" col-md-4 mb-4">
+
+
+
+			<article class="col-md-4 mb-4">
+
 				<form action="/agregar" method="post">
 					<div class="card overflow-hidden shadow">
-						<input type="text" value="{{ producto.producto.id }}"
-							name="producto_id_{{ producto.producto.id }}" hidden>
-						<input type="text" name="cantidad_{{ producto.producto.id }}" value="1" hidden>
-
 						<img class="card-img-top" src="{{producto.producto.logo}}" alt="{{producto.producto.nombre}}"
 							class="img-fluid" />
 						<div class="card-body py-4 px-3">
 							<div class="d-flex flex-column flex-lg-row justify-content-between mb-3">
 								<h4 class="text-secondary fw-medium"><a
 										class="link-900 text-decoration-none stretched-link"
-										href="#!">{{producto.producto.nombre}}</a>
-								</h4>
-
+										href="#!">{{producto.producto.nombre}}</a></h4><span
+									class="fs-1 fw-medium">Explorar</span>
 							</div>
-							<div class="d-flex align-items-center"> <img src="static/assets/img/dest/dest2.jpg"
-									style="margin-right: 14px" width="20" alt="navigation" /><span
-									class="fs-0 fw-medium">{{producto.producto.subcategoria.nombre}}</span>
+							<div class="d-flex align-items-center">
+								<img src="static/assets/img/dest/navigation.svg" style="margin-right: 14px" width="20"
+									alt="navigation" />
+
 							</div>
 						</div>
-
 					</div>
+					<input type="text" value="{{ producto.producto.id }}" name="producto_id_{{ producto.producto.id }}"
+						hidden>
+					<input type="text" name="cantidad_{{ producto.producto.id }}" value="1" hidden>
 					<button class="btn btn-success" type="submit" data-id="{{ producto.producto.id }}">Agregar al
 						carrito</button>
 				</form>
-			</div>
+			</article>
+
+
+
+
+
 			{% endfor %}
-
-
 		</div>
-	</div><!-- end of .container-->
 
+	</div>
 </section>
-<div class="show-onhover position-relative">
-	<div class="card hideEl shadow position-absolute end-0 start-xl-50 bottom-100 translate-xl-middle-x ms-3"
-		style="width: 260px;border-radius:18px;">
-		<div class="card-body py-3">
-			<div class="d-flex">
-				<div style="margin-right: 10px"> <img class="rounded-circle"
-						src="assets/img/steps/favorite-placeholder.png" width="50" alt="favorite" /></div>
-				<div>
-					<p class="fs--1 mb-1 fw-medium">Ongoing </p>
-					<h5 class="fw-medium mb-3"></h5>
-					<h6 class="fs--1 fw-medium mb-2"><span>88880%</span> completed</h6>
-					<div class="progress" style="height: 6px;">
-						<div class="progress-bar" role="progressbar" style="width: 40%;" aria-valuenow="25"
-							aria-valuemin="0" aria-valuemax="100"></div>
-					</div>
-				</div>
+{% for producto in Precios %}
+<div id="modal-default{{producto.producto.id}}" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h4 class="modal-title">Descripcion de {{producto.producto.nombre}}</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			</div>
+			<div class="modal-body">
+				{{producto.producto.descripcion}}
+			</div>
+			<div class="modal-footer">
+				<input type="button" class="btn
+									btn-default" data-dismiss="modal" value="Cancel">
+				<input type="submit" class="btn
+									btn-success" value="Add">
+			</div>
+
 		</div>
 	</div>
-	<button class="btn"> <img src="assets/img/steps/heart.svg" width="20" alt="step" /></button>
 </div>
-
+{% endfor %}
 <script>
 
 	document.getElementById('openDialogButton').addEventListener('click', async function () {
@@ -278,80 +282,4 @@
 	});
 </script>
 
-<script>
-
-	document.getElementById('openDialogButton1').addEventListener('click', async function () {
-		const steps = ['1', '2', '3'];
-		const swalQueueStep = Swal.mixin({
-			confirmButtonText: 'Continuar',
-			cancelButtonText: 'Atras',
-			progressSteps: steps,
-			input: 'text',
-			inputAttributes: {
-				required: true
-			},
-			reverseButtons: true,
-			validationMessage: 'Este campo son requeridos'
-		});
-
-		const values = [];
-		let currentStep;
-
-		for (currentStep = 0; currentStep < steps.length;) {
-			let inputType = 'text';
-			let inputText = '';
-
-			if (currentStep === 0) {
-				inputType = 'textarea';
-				inputText = 'Describe tu pedido';
-			} else if (currentStep === 1) {
-				inputType = 'number';
-				inputText = 'Ingresa tu presupuesto';
-			} else if (currentStep === 2) {
-				inputType = 'file';
-				inputText = 'Sube tus fotos de inspiración(* Obligatorio *)';
-			}
-
-			const result = await swalQueueStep.fire({
-				title: `Pregunta ${steps[currentStep]}`,
-				text: inputText,
-				input: inputType,
-				inputValue: values[currentStep],
-				showCancelButton: currentStep > 0,
-				currentProgressStep: currentStep
-			});
-
-			if (result.value) {
-				values[currentStep] = result.value;
-				currentStep++;
-			} else if (result.dismiss === Swal.DismissReason.cancel) {
-				currentStep--;
-			} else {
-				break;
-			}
-		}
-
-		if (currentStep === steps.length) {
-			const formData = new FormData();
-			formData.append('cliente_id', '{{ session["cliente_id"] }}');
-			formData.append('descripcion', values[0]);
-			formData.append('presupuesto', values[1]);
-			formData.append('foto', values[2]);
-
-			fetch('/personalizacion', {
-				method: 'POST',
-				body: formData
-			})
-				.then(response => response.json())
-				.then(data => {
-					console.log(data);
-					Swal.fire('Success', 'Los datos han sido enviados correctamente', 'success');
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					Swal.fire('Error', 'Ocurrió un error al enviar los datos', 'error');
-				});
-		}
-	});
-</script>
 {% endblock %}

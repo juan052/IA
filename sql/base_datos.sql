@@ -207,6 +207,19 @@ CREATE TABLE usuario
     estado INTEGER 
 );
 
+CREATE TABLE conexion(
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuario(id),
+    ip VARCHAR(250) ,
+    mac VARCHAR(250),
+    navegador VARCHAR(150),
+    version_navegador VARCHAR(150),
+    os VARCHAR(150),
+    version_os VARCHAR(150),
+    fecha date DEFAULT CURRENT_DATE,
+    estado INTEGER NOT NULL
+);
+
 CREATE TABLE privilegio_modulo(
     id SERIAL PRIMARY KEY,
     id_sub INTEGER REFERENCES submodulo(id),

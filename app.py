@@ -1,11 +1,9 @@
 import os
 from datetime import datetime, date
 import random
+from user_agents import parse
 from decimal import Decimal
 import string
-import requests
-import uuid
-import time
 from flask import Flask, session, redirect, url_for, render_template, request, flash,jsonify
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
@@ -116,7 +114,28 @@ def shop():
     
     return render_template('shop.html', Precios=Precios, usuario=usuario, cantidad=cantidad, confirmar=confirmar)
     
-   
+@app.route("/perfil/<int:id>", methods=["POST","GET"])
+@login_requirede
+def perfil(id):
+    cliente = Clientes.query.get(id)
+    
+    if cliente is None:
+        return "Cliente no encontrado", 404
+    
+    persona = db.session.query(Persona, PersonaNatural, PersonaJuridica).\
+        select_from(Clientes).\
+        join(Persona, Clientes.id_persona == Persona.id).\
+        outerjoin(PersonaNatural, Persona.id == PersonaNatural.id_persona).\
+        outerjoin(PersonaJuridica, Persona.id == PersonaJuridica.id_persona).\
+        filter(Clientes.id == id).\
+        first()
+
+    if persona is None:
+        return "Persona no encontrada", 404
+    
+    persona_obj, persona_natural, persona_juridica = persona
+    
+    return render_template("perfil.html", cliente=cliente, persona=persona_obj, persona_natural=persona_natural, persona_juridica=persona_juridica)
 #Gestion de productos
 @app.route("/categoria")
 @login_required
@@ -840,19 +859,51 @@ def validar():
                 session['cliente_direccion'] = persona.direccion
                 session['cliente_celular'] = persona.celular
                 session['cliente_correo']=persona.correo
+                client_ip = request.remote_addr
+                user_agent = parse(request.headers.get('User-Agent'))
+                browser = user_agent.browser.family
+                os = user_agent.os.family
+                os_version = user_agent.os.version_string
+                nueva_conexion = Conexion(
+                    id_usuario=usuario_db.id,  # Reemplaza con el ID del usuario correspondiente
+                    ip=client_ip,
+                    mac='',  # Puede ser difícil obtener la MAC desde el navegador
+                    navegador=browser,
+                    version_navegador='',
+                    os=os,
+                    version_os=os_version,
+                    estado=1  # Estado por defecto
+                )
+                db.session.add(nueva_conexion)
+                db.session.commit()
                 return redirect(url_for('home'))            
             elif usuario_db.id_grupo == 1 and usuario_db.estado == 1 :
                 
                  trabajador = Trabajador.query.filter_by(id_persona=usuario_db.id_persona).first()
-                 print("trabajador:", trabajador)
                  persona = Persona.query.filter_by(id=usuario_db.id_persona).first()
-                 print("persona:", persona)
                  session['user_id'] = trabajador.id
                  session['trabajador_foto'] = trabajador.foto
                  session['trabajador_nombre'] = persona.nombre
                  session['trabajador_direccion'] = persona.direccion
                  session['trabajador_celular'] = persona.celular
                  session['id_usuario']=usuario_db.id
+                 client_ip = request.remote_addr
+                 user_agent = parse(request.headers.get('User-Agent'))
+                 browser = user_agent.browser.family
+                 os = user_agent.os.family
+                 os_version = user_agent.os.version_string
+                 nueva_conexion = Conexion(
+                    id_usuario=usuario_db.id,  # Reemplaza con el ID del usuario correspondiente
+                    ip=client_ip,
+                    mac='',  # Puede ser difícil obtener la MAC desde el navegador
+                    navegador=browser,
+                    version_navegador='',
+                    os=os,
+                    version_os=os_version,
+                    estado=1  # Estado por defecto
+                 )
+                 db.session.add(nueva_conexion)
+                 db.session.commit()
                  flash("Bienvenido(a), "+persona.nombre, "success")
                  return redirect(url_for('admin'))
             else:
@@ -895,8 +946,6 @@ def agregar():
     carrito = session.get('carrito', [])
     
     for key, value in request.form.items():
-        print("Clave:", key)
-        print("Valor:", value)
         if key.startswith('producto_id_'):
             producto_id = int(key.split('_')[2])  # Obtener el ID del producto del nombre de la clave
             cantidad_key = 'cantidad_' + str(producto_id)  # Construir la clave específica de cantidad
@@ -906,8 +955,7 @@ def agregar():
                 print("Producto:", producto)
             # Validar la cantidad disponible del producto
                 producto = Producto.query.get(producto_id)
-                print("--------------------------------------")
-                print("xd"+str(producto.cantidad))
+              
                 cantidad_carrito = obtener_cantidad_en_carrito(carrito, producto_id)
 
                 if producto and int(producto.cantidad) >= (int(cantidad) + cantidad_carrito):
@@ -1551,14 +1599,12 @@ def detalle_pedidos():
 def confirmar(id):
     if request.method == "GET":
         confirmar = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2, Personalizacion.id == id).first()
-        cliente=confirmar.personalizacion.cliente.persona.nombre
-        print(cliente)
+
         return render_template("confirmar.html", confirmar=confirmar)
     if request.method == "POST":
         id_personalizacion = request.form.get('id')
         estado = int(request.form.get('estado'))
         personalizacion = Personalizacion.query.get(id_personalizacion)
-        print(id_personalizacion)
         if personalizacion is not None:
             # Realiza las acciones necesarias con la personalización
             # según si se acepta o se rechaza
@@ -1581,7 +1627,6 @@ def confirmar(id):
        
            
         else:
-            print("No se realizo nada")
             flash('No se encontró la personalización solicitada.', 'error')
             return redirect('/shop')
 
@@ -1643,12 +1688,6 @@ def ventas():
             'detalles_venta': detalles_venta,
             'subtotal_venta': subtotal_venta
         })
-
-   
-
-      
-
-
     return render_template('venta.html', ventas=ventas,ventas_personalizaciones=ventas_personalizaciones, ventas_productos=ventas_productos,confirmar=confirmar,ventas_con_productos=ventas_con_productos)
 
 

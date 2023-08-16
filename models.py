@@ -391,3 +391,29 @@ class SubModulo(db.Model):
         self.id_modulo = id_modulo
         self.nombre = nombre
         self.enlace = enlace
+
+class Conexion(db.Model):
+    __tablename__ = 'conexion'
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    ip = db.Column(db.String(250))
+    mac = db.Column(db.String(250))
+    navegador = db.Column(db.String(150))
+    version_navegador = db.Column(db.String(150))
+    os = db.Column(db.String(150))
+    version_os = db.Column(db.String(150))
+    fecha = db.Column(db.Date, server_default=db.func.current_date())
+    estado = db.Column(db.Integer, nullable=False)
+    
+    usuario = relationship('Usuario')  # Mantén solo la relación aquí
+    
+    def __init__(self, id_usuario, ip, mac, navegador, version_navegador, os, version_os, estado):
+        self.id_usuario = id_usuario
+        self.ip = ip
+        self.mac = mac
+        self.navegador = navegador
+        self.version_navegador = version_navegador
+        self.os = os
+        self.version_os = version_os
+        self.estado = estado
