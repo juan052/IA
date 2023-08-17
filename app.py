@@ -142,6 +142,102 @@ def perfil(id):
     persona_obj, persona_natural, persona_juridica = persona
     
     return render_template("perfil.html", cliente=cliente, persona=persona_obj, persona_natural=persona_natural, persona_juridica=persona_juridica)
+
+@app.route('/actualizar_clientes/<int:id>', methods=["GET", "POST"])
+@login_requirede
+def actualizar_clientes(id):
+   
+    cliente = Cliente.query.get(id)
+    print(cliente)
+    if request.method == "POST":
+        # Obtener los datos del formulario
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        telefono = request.form.get("celular")
+        fecha_nacimiento = request.form.get("fecha_nacimiento")
+        cedula = request.form.get("cedula")
+        genero = request.form.get("genero")
+        direccion = request.form.get("direccion")
+        logo = cliente.foto
+        if 'foto' in request.files:
+            archivo_foto = request.files['foto']
+            if archivo_foto:
+                try:
+                    if logo:
+                                # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                        public_id_anterior = logo.split('/')[-1].split('.')[0]
+                                # Intenta eliminar la imagen anterior de Cloudinary
+                        try:
+                                cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                        except cloudinary.exceptions.Error as delete_error:
+                                print(f"Error al eliminar la imagen anterior: {delete_error}")
+
+                            # Subir y transformar la nueva imagen
+                        result = cloudinary.uploader.upload(archivo_foto,transformation={"width": 300, "height": 300})
+                        secure_url = result["secure_url"]
+                except cloudinary.exceptions.Error as upload_error:
+                    flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
+                    return redirect('/perfil')  
+
+                    
+       
+        # Actualizar los datos del cliente existente
+        cliente.persona.nombre = nombre
+      
+        cliente.persona.direccion = direccion
+        cliente.persona.celular = telefono
+        cliente.persona.persona_natural.apellido = apellido
+        cliente.persona.persona_natural.cedula = cedula
+        cliente.persona.persona_natural.fecha_nacimiento = fecha_nacimiento
+        cliente.persona.persona_natural.genero = genero
+       
+        cliente.foto = secure_url
+       
+        db.session.add(cliente)
+        db.session.commit()
+        session['cliente_foto'] =secure_url
+        session['cliente_direccion']=cliente.persona.direccion
+        flash("Se ha actualizado correctamente la informacion","success")
+        return redirect(f'/perfil/{id}')
+
+    return redirect(f'/perfil/{id}')
+
+@app.route("/cambiar_contraseñas",methods=["GET","POST"])
+@login_requirede
+def cambiar_contraseñas():
+    if request.method == "POST":
+        id=request.form.get('id')
+        id_cliente=request.form.get('id_cliente')
+        usuario=Usuario.query.get(id)
+        print(usuario)
+        contraseña_anterior=request.form.get('contraseña_actual')
+        contraseña_nueva =request.form.get('contraseña_nueva')
+        confirmacion=request.form.get('confirmacion')
+        usuario = Usuario.query.get(id)
+        if usuario is None:
+         # Manejar el caso cuando el usuario no existe
+            return "El usuario no existe"
+
+  
+        if not check_password_hash(usuario.contraseña, contraseña_anterior):
+        # Manejar el caso cuando la contraseña actual no coincide
+            flash("La contraseña actual no coincide", "error")
+            return redirect(f'/perfil/{id_cliente}')
+    
+        if contraseña_nueva != confirmacion:
+            # Manejar el caso cuando la confirmación de contraseña no coincide
+            flash("La contraseña nueva no coinciden.", "error")
+            return redirect(f'/perfil/{id_cliente}')
+          
+        
+        hashed_password = generate_password_hash(contraseña_nueva)
+        usuario.contraseña=hashed_password
+        db.session.commit()
+        flash("Se ha cambiado la contraseña correctamente", "success")
+        return redirect(f'/perfil/{id_cliente}')
+
+
+
 #Gestion de productos
 @app.route("/categoria")
 @login_required

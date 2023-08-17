@@ -16,8 +16,168 @@
                         <h5 class="my-3">{{persona.nombre}}</h5>
                         <p class="text-dark mb-4">{{persona.direccion}}</p>
                         <div class="d-flex justify-content-center mb-2">
-                            <button type="button" class="btn btn-outline-primary ms-1">Actualizar</button>
-                            <button type="button" class="btn btn-outline-primary ms-1">Cambiar contraseña</button>
+                            <button type="button" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                class="btn btn-outline-primary ms-1">Actualizar</button>
+                            <button type="button" class="btn btn-outline-primary ms-1" data-bs-toggle="modal"
+                                data-bs-target="#exampleModales">Cambiar contraseña</button>
+                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Actualizar informacion
+                                            </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <Form action="/actualizar_clientes/{{cliente.id}}" method="post"
+                                            enctype="multipart/form-data">
+                                            <div class="modal-body">
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Nombre: </label>
+                                                            <input type="text" name="nombre" class="form-control"
+                                                                value="{{persona.nombre}}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+
+                                                        <div class="form-group">
+                                                            <label>Apellido: </label>
+                                                            <input type="text" name="apellido" class="form-control"
+                                                                value="{{persona_natural.apellido}}" required>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Cedula: </label>
+                                                            <input type="text" name="cedula" class="form-control"
+                                                                value="{{persona_natural.cedula}}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Fecha de nacimiento:
+                                                            </label>
+                                                            <input type="date" name="fecha_nacimiento"
+                                                                class="form-control"
+                                                                value="{{persona_natural.fecha_nacimiento}}" required>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Celular:</label>
+                                                            <input type="text" name="celular" class="form-control"
+                                                                value="{{persona.celular}}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Genero</label>
+                                                            <select name="genero" id class="form-control">
+                                                                <option value="F" {% if persona_natural.genero=="F"
+                                                                    %}selected{% endif %}>Femenino</option>
+                                                                <option value="M" {% if persona_natural.genero=="M"
+                                                                    %}selected{% endif %}>Masculino</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>Direccion: </label>
+                                                            <textarea name="direccion" class="form-control"
+                                                                required>{{persona.direccion}}</textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>Foto</label>
+
+                                                            <input type="file" name="foto" class="form-control"
+                                                                required>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success">Guardar
+                                                    Actualizacion</button>
+                                            </div>
+                                        </Form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="exampleModales" tabindex="-1"
+                                aria-labelledby="exampleModalLabeles" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Actualizar Contraseña
+                                            </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <Form action="/cambiar_contraseñas" method="post" enctype="multipart/form-data">
+                                            <div class="modal-body">
+
+                                                <div class="row">
+                                                    <input type="text" name="id" value="{{session['cliente_usuario']}}"
+                                                        hidden>
+                                                    <input type="text" name="id_cliente" value="{{cliente.id}}" hidden>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Contraseña actual: </label>
+                                                            <input type="text" name="contraseña_actual"
+                                                                class="form-control" value="" required>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Nueva contraseña: </label>
+                                                            <input type="text" name="contraseña_nueva"
+                                                                class="form-control" value="" required>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Confirmar contraseña: </label>
+                                                            <input type="text" name="confirmacion" class="form-control"
+                                                                value="" required>
+                                                        </div>
+                                                    </div>
+
+
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success">Actualizar
+                                                    contraseña</button>
+                                            </div>
+                                        </Form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -142,35 +302,6 @@
                 </div>
 
                 {% endif %}
-            </div>
-            <div class="col-md-12 col-sm-12">
-                <div class="card mb-4 mb-lg-0">
-                    <h2>Resumen de actividad</h2>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush rounded-3">
-                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                <i class="fas fa-globe fa-lg text-warning"></i>
-                                <p class="mb-0">https://mdbootstrap.com</p>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                <i class="fab fa-github fa-lg" style="color: #333333;"></i>
-                                <p class="mb-0">mdbootstrap</p>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
-                                <p class="mb-0">@mdbootstrap</p>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
-                                <p class="mb-0">mdbootstrap</p>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
-                                <p class="mb-0">mdbootstrap</p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
