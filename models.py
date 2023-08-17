@@ -403,12 +403,13 @@ class Conexion(db.Model):
     version_navegador = db.Column(db.String(150))
     os = db.Column(db.String(150))
     version_os = db.Column(db.String(150))
+    dispostivo=db.Column(db.String(150))
+    version_dispositivos=db.Column(db.String(150))
     fecha = db.Column(db.Date, server_default=db.func.current_date())
     estado = db.Column(db.Integer, nullable=False)
-    
     usuario = relationship('Usuario')  # Mantén solo la relación aquí
     
-    def __init__(self, id_usuario, ip, mac, navegador, version_navegador, os, version_os, estado):
+    def __init__(self, id_usuario, ip, mac, navegador, version_navegador, os, version_os,dispostivo,version_dispositivos, estado):
         self.id_usuario = id_usuario
         self.ip = ip
         self.mac = mac
@@ -416,4 +417,6 @@ class Conexion(db.Model):
         self.version_navegador = version_navegador
         self.os = os
         self.version_os = version_os
+        self.dispostivo=dispostivo
+        self.version_dispositivos=version_dispositivos
         self.estado = estado

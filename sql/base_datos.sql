@@ -216,6 +216,8 @@ CREATE TABLE conexion(
     version_navegador VARCHAR(150),
     os VARCHAR(150),
     version_os VARCHAR(150),
+    dispostivo VARCHAR(150),
+    version_dispositivos VARCHAR(150),
     fecha date DEFAULT CURRENT_DATE,
     estado INTEGER NOT NULL
 );

@@ -72,8 +72,14 @@ def home():
         Precios = Precio.query.options(joinedload(Precio.producto)).limit(3).all()
         return render_template('index.html', Precios=Precios, usuario=usuario)
     
-@app.route("/logout")
-def logout():
+@app.route("/logout/<int:id>", methods=["POST","GET"])
+def logout(id): 
+    conexion= Conexion.query.get(id)
+    conexion.estado=2
+    db.session.add(conexion)
+    db.session.commit()
+
+
       # Borrar toda la sesión
     session.clear()
 
@@ -859,23 +865,34 @@ def validar():
                 session['cliente_direccion'] = persona.direccion
                 session['cliente_celular'] = persona.celular
                 session['cliente_correo']=persona.correo
+                session['cliente_usuario']=usuario_db.id
                 client_ip = request.remote_addr
                 user_agent = parse(request.headers.get('User-Agent'))
                 browser = user_agent.browser.family
+                version_browser=user_agent.browser.version
                 os = user_agent.os.family
                 os_version = user_agent.os.version_string
+                dispositivo=user_agent.device.family
+                version_dispositivo=user_agent.device.brand
+                if version_dispositivo == None:
+                    version_dispositivo="desconocido"
+                
                 nueva_conexion = Conexion(
                     id_usuario=usuario_db.id,  # Reemplaza con el ID del usuario correspondiente
                     ip=client_ip,
                     mac='',  # Puede ser difícil obtener la MAC desde el navegador
                     navegador=browser,
-                    version_navegador='',
+                    version_navegador=version_browser,
                     os=os,
                     version_os=os_version,
+                    dispostivo=dispositivo,
+                    version_dispositivos=version_dispositivo,
                     estado=1  # Estado por defecto
                 )
                 db.session.add(nueva_conexion)
                 db.session.commit()
+                session['id_conexion']=nueva_conexion.id
+
                 return redirect(url_for('home'))            
             elif usuario_db.id_grupo == 1 and usuario_db.estado == 1 :
                 
@@ -890,21 +907,30 @@ def validar():
                  client_ip = request.remote_addr
                  user_agent = parse(request.headers.get('User-Agent'))
                  browser = user_agent.browser.family
+                 version_browser=user_agent.browser.version
                  os = user_agent.os.family
                  os_version = user_agent.os.version_string
+                 dispositivo=user_agent.device.family
+                 version_dispositivo=user_agent.device.brand
+                 if version_dispositivo == None:
+                    version_dispositivo="desconocido"
                  nueva_conexion = Conexion(
                     id_usuario=usuario_db.id,  # Reemplaza con el ID del usuario correspondiente
                     ip=client_ip,
                     mac='',  # Puede ser difícil obtener la MAC desde el navegador
                     navegador=browser,
-                    version_navegador='',
+                    version_navegador=version_browser,
                     os=os,
                     version_os=os_version,
+                    dispostivo=dispositivo,
+                    version_dispositivos=version_dispositivo,
                     estado=1  # Estado por defecto
-                 )
+                )
+                 
                  db.session.add(nueva_conexion)
                  db.session.commit()
-                 flash("Bienvenido(a), "+persona.nombre, "success")
+                 session['id_conexion']=nueva_conexion.id
+                 flash("Bienvenido(a), "+ persona.nombre, "success")
                  return redirect(url_for('admin'))
             else:
                 flash("Acceso denegado.", "error")
