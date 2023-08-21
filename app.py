@@ -236,7 +236,23 @@ def cambiar_contraseñas():
         flash("Se ha cambiado la contraseña correctamente", "success")
         return redirect(f'/perfil/{id_cliente}')
 
-
+@app.route("/pedido/<int:id>", methods=["GET","POST"])
+@login_requirede
+def pedido(id):
+    cliente=Clientes.query.get(id)
+    id=cliente.id
+    pedidos = (
+    DetallePersonalizacion.query
+    .options(joinedload(DetallePersonalizacion.personalizacion))
+    .filter(DetallePersonalizacion.personalizacion.has(id_cliente=id))
+    .all())
+    ventas=(DetalleVenta.query
+            .options(joinedload(DetalleVenta.venta))
+            .filter(DetalleVenta.venta.has(id_cliente=id))
+            .all())
+    print(pedidos)
+    print(ventas)
+    return render_template("pedidos.html")
 
 #Gestion de productos
 @app.route("/categoria")
