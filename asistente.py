@@ -1,16 +1,32 @@
 import speech_recognition as sr
-from gtts import gTTS
 import os
 import datetime
 import pytz
 import time
+from gtts import gTTS
+from sqlalchemy import create_engine, text, not_,and_, func
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import exists, not_
+from models import *
+DATABASE_URL = "postgresql://postgres:lyV0fDeA4LX8EyD9yULa@containers-us-west-203.railway.app:6039/railway"
+# Crea una conexión a la base de datos
+engine = create_engine(DATABASE_URL)
+# Crea una fábrica de sesiones
+Session = sessionmaker(bind=engine)
+# Crea una instancia de sesión
+session = Session()
+
+
+
 respuestas = {
     "hola": "¡Hola! ¿En qué puedo ayudarte?",
-    "cómo estás": "Leroy muele cochones del Casimiro Sotelo.",
+    "cómo estás": "Bien y tu?",
     "qué hora es": "",
     "adiós": "Hasta luego. ¡Que tengas un buen día!",
-    "Messi": "¡Claro! Sin duda alguna Leonel Andres Messi.",
-    "qué puedo comprar": "Ofrecemos una variedad de productos desde collares, pulseras personzalisacion de cover y lienzo y mas"
+    "productos": "",
+    "categorias":"",
+    "qué puedo comprar": "Ofrecemos una variedad de productos desde collares, pulseras personalizacion de cover y lienzo y mas"
 }
 
 def obtener_hora():
@@ -18,6 +34,17 @@ def obtener_hora():
     hora_actual = datetime.datetime.now(tz_nicaragua).strftime("%H:%M")
     print(hora_actual)
     return f"La hora actual en Nicaragua es {hora_actual}."
+
+def obtener_productos(session):
+    productos = session.query(CategoriaProducto).all()
+    nombres_productos = [producto.nombre for producto in productos]
+    
+    cadena_productos = ", ".join(nombres_productos)
+    resultado = f"Los productos que contamos actualmente son: {cadena_productos}"
+    
+    print(resultado)
+    return resultado
+
 
 def escuchar():
     r = sr.Recognizer()
@@ -39,7 +66,7 @@ def hablar(texto):
     tts = gTTS(texto, lang="es-Es")
     tts.save("respuesta.mp3")
     os.system("start respuesta.mp3")
-    time.sleep(6)
+    time.sleep(5)
 
 def asistente():
     hablar("Hola, soy tu asistente de voz Luxx. ¿En qué puedo ayudarte?")
@@ -49,6 +76,9 @@ def asistente():
             respuesta = respuestas[comando]
             if comando == "qué hora es":
                 respuesta = obtener_hora()
+            if comando=="productos":
+                respuesta = obtener_productos(session)
+
             hablar(respuesta)
         else:
             hablar("Lo siento, no comprendo ese comando.")
