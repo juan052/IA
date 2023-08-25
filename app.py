@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, date
 import random
 from user_agents import parse
@@ -1296,21 +1297,26 @@ def guardar_venta():
         fecha_actual = datetime.now()
         fecha_postgresql = fecha_actual.strftime('%Y-%m-%d')
         ultima_venta = Venta.query.order_by(Venta.id.desc()).first()
-        print(ultima_venta)
+        
         if ultima_venta:
             id_venta=ultima_venta.id +1
         else:
             id_venta = 1
 
         codigo = "V-00" + str(id_venta) 
-        data = request.form 
-        
-        print(data)
-        tipo_entrega=data.get('tipo-entrega')
-        estado=data.get('estado')
-        print(tipo_entrega)
-        print(estado)
-        venta = Venta(id_tipo=1, id_cliente=id_cliente, fecha=fecha_postgresql,codigo=codigo,tipo_entrega=tipo_entrega, estado=estado)
+        tipo_entrega=request.form.get('flexRadioDefault')
+        direccion=request.form.get('direccion')
+        print(direccion)
+        print("-----------------------------","codigo de venta", codigo)
+        print("fecha:",fecha_postgresql,"------------", "Tipo de venta:",id_tipo)
+        print("------------------------------")
+        print("Cliente:", id_cliente)
+        print("------------------------------------------------------")
+        print("------Tipo de entrega---------------")
+        print("Lugar de entrega:",tipo_entrega)
+        print("----------------------------------")
+        lugar=tipo_entrega+" "+ direccion
+        venta = Venta(id_tipo=1, id_cliente=id_cliente, fecha=fecha_postgresql,codigo=codigo,tipo_entrega=lugar, estado=1,fecha_entrega=fecha)
         db.session.add(venta)
         db.session.commit()   
         
@@ -1662,11 +1668,7 @@ def personalizacion():
         presupuesto = request.form.get('presupuesto')
         foto = request.files['foto']
 
-        print(f'Cliente ID: {cliente_id}')
-        print(f'Descripción: {descripcion}')
-        print(f'Presupuesto: {presupuesto}')
-        print(f'Foto: {foto.filename}')
-
+     
         logo = None
         if 'foto' in request.files: 
             logo = request.files['foto']
@@ -1944,11 +1946,21 @@ def crear_venta_pedidos():
     if request.method == "POST":
         id=request.form.get('id')
         descuento=request.form.get('descuento')
+        fecha_entrega_str=request.form.get('fecha_entrega')
+        fecha_entrega = datetime.strptime(fecha_entrega_str, '%Y-%m-%d').date()
         venta=Venta.query.get(id)
         venta.estado=2
+        venta.fecha_entrega=fecha_entrega
         db.session.add(venta)
         db.session.commit()
-
+        if descuento is None or not descuento.strip():
+            descuento = Decimal('0.00')
+        else:
+            try:
+                descuento = Decimal(descuento)
+            except InvalidOperation:
+                return "No se puede convertir"
+       
         detalles_venta = DetalleVenta.query.filter_by(id_venta=id).all()
         for detalle in detalles_venta:
             detalle.descuento = descuento
