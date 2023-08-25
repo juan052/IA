@@ -2,7 +2,8 @@
 {% block title %} || Productos{% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='plugins/select2/css/select2.min.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 <link rel="stylesheet"
     href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet"
@@ -34,16 +35,15 @@
                     <div class="card-header">
                         <h3 class="card-title">Lista de Productos</h3>
                         <div class="align-content-end text-right">
-                            <button type="button" class="btn btn-secondary"
-                                data-toggle="modal" data-target="#modal-default">Agregar
+                            <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                data-target="#modal-default">Agregar
                                 Productos</button>
                         </div>
 
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example1"
-                            class="table table-bordered table-striped">
+                        <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th>Categoria</th>
@@ -66,27 +66,21 @@
                                     <td>{{ productos.nombre }}</td>
                                     <td>{{ productos.descripcion }}</td>
                                     <td>{{ productos.cantidad }}</td>
-                                    <th> <img
-                                            src="{{productos.logo}}"
-                                            alt width="50"></th>
+                                    <th> <img src="{{productos.logo}}" alt width="50"></th>
                                     <td>
                                         {% if productos.estado == 1 %}
                                         <span class="badge bg-success">Activo</span>
                                         {% elif productos.estado == 2 %}
-                                       <span class="badge bg-danger">Inactivo</span> 
+                                        <span class="badge bg-danger">Inactivo</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a
-                                            href="#modal-default{{productos.id}}"
-                                            class="edit" data-toggle="modal">
-                                            <i
-                                                class="fas fa-pencil-alt"></i>
+                                        <a href="#modal-default{{productos.id}}" class="edit" data-toggle="modal">
+                                            <i class="fas fa-pencil-alt"></i>
                                         </a>
-                                        <a data-toggle="modal"
-                                        data-target="#modal-danger{{productos.id}}"
-                                        class="fas fa-trash-alt">
-                                          
+                                        <a data-toggle="modal" data-target="#modal-danger{{productos.id}}"
+                                            class="fas fa-trash-alt">
+
                                         </a>
                                     </td>
                                 </tr>
@@ -104,65 +98,48 @@
     <div id="modal-default" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="/producto_crear" method="post"
-                    enctype="multipart/form-data">
+                <form action="/producto_crear" method="post" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h4 class="modal-title">Crear productos</h4>
-                        <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-hidden="true">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Categoria</label>
-                            <select name="subcategoria" id
-                                class="form-control">
-                                {% for subcategoria in subcategorias %}
-                                <optgroup label="{{
-                                        subcategoria.categoria.nombre }}">
-                                    <option
-                                        value="{{ subcategoria.id }}">{{
-                                        subcategoria.nombre }}</option>
+                            <label>Categoria:</label>
+                            <select name="subcategoria" class="form-control select2bs4" style="width: 100%;" style="width: 100%;">
+                                {% for categoria_id, categoria_data in categorias.items() %}
+                                <optgroup label="{{ categoria_data.nombre }}">
+                                    {% for subcategoria in categoria_data.subcategorias %}
+                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nombre }}</option>
+                                    {% endfor %}
                                 </optgroup>
                                 {% endfor %}
                             </select>
-
                         </div>
                         <div class="form-group">
                             <label>Nombre</label>
-                            <input type="text" name="nombre"
-                                class="form-control"
-                                required>
+                            <input type="text" name="nombre" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>descripcion</label>
-                            <textarea name="descripcion"
-                                class="form-control"
-                                required></textarea>
+                            <textarea name="descripcion" class="form-control" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Cantidad</label>
-                            <input type="number" name="cantidad"
-                                class="form-control"
-                                required>
+                            <input type="number" name="cantidad" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Foto</label>
-                            <input type="file" name="foto"
-                                class="form-control"
-                                required>
+                            <input type="file" name="foto" class="form-control" required>
                         </div>
-                        <select name="estado" id
-                            class="form-control">
+                        <select name="estado" id class="form-control">
                             <option value="1">Activo</option>
                             <option value="2">Inactivo</option>
                         </select>
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn
-                                btn-default"
-                            data-dismiss="modal"
-                            value="Cancel">
+                                btn-default" data-dismiss="modal" value="Cancel">
                         <input type="submit" class="btn
                                 btn-success" value="Add">
                     </div>
@@ -175,51 +152,43 @@
     <div id="modal-default{{productos.id}}" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="/producto_actualizar/{{productos.id}}"
-                    method="post" enctype="multipart/form-data">
+                <form action="/producto_actualizar/{{productos.id}}" method="post" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h4 class="modal-title">Editar producto</h4>
-                        <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-hidden="true">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Categoria</label>
-                            <select name="subcategoria" id
-                                class="form-control">
-                                {% for subcategoria in subcategorias %}
-                                <optgroup label="{{
-                                        subcategoria.categoria.nombre }}">
-                                    <option value="{{subcategoria.id}}"
-                                        {%
-                                        if subcategoria.id ==
-                                        subcategoria.id %}selected{%
-                                        endif
-                                        %}>{{subcategoria.nombre}}</option>
+                            <select name="subcategorias"  class="form-control select2bs4" style="width: 100%;">
+                                {% for categoria_id, categoria_data in categorias.items() %}
+                                <optgroup label="{{ categoria_data.nombre }}">
+                                    {% for subcategoria in categoria_data.subcategorias %}
+                                    <option value="{{ subcategoria.id }}" {% if
+                                        subcategoria.id==selected_subcategoria_id %}selected{% endif %}>
+                                        {{ subcategoria.nombre }}
+                                    </option>
+                                    {% endfor %}
                                 </optgroup>
                                 {% endfor %}
                             </select>
+
 
                         </div>
 
                         <div class="form-group">
                             <label>Nombre</label>
-                            <input type="text" name="nombre"
-                                class="form-control"
-                                required value="{{productos.nombre}}">
+                            <input type="text" name="nombre" class="form-control" required value="{{productos.nombre}}">
                         </div>
                         <div class="form-group">
                             <label>descripcion</label>
-                            <textarea name="descripcion"
-                                class="form-control"
+                            <textarea name="descripcion" class="form-control"
                                 required>{{productos.descripcion}}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Cantidad</label>
-                            <input type="number" name="cantidad"
-                                class="form-control"
-                                required value="{{productos.cantidad}}">
+                            <input type="number" name="cantidad" class="form-control" required
+                                value="{{productos.cantidad}}">
                         </div>
                         <div class="form-group">
 
@@ -230,28 +199,20 @@
                             {% endif %}
 
                             <label>Foto nueva</label>
-                            <input type="file" name="foto"
-                                class="form-control"
+                            <input type="file" name="foto" class="form-control"
                                 value="/static/img/imagenes/{{productos.logo}}">
                         </div>
                         <div class="form-group">
-                            <select name="estado" id
-                                class="form-control">
-                                <option value="1" {% if productos.estado
-                                    ==
-                                    1 %}selected{% endif %}>Activo</option>
-                                <option value="2" {% if productos.estado
-                                    ==
-                                    2 %}selected{% endif %}>Inactivo</option>
+                            <select name="estado" id class="form-control">
+                                <option value="1" {% if productos.estado==1 %}selected{% endif %}>Activo</option>
+                                <option value="2" {% if productos.estado==2 %}selected{% endif %}>Inactivo</option>
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn
-                                btn-default"
-                            data-dismiss="modal"
-                            value="Cancel">
-                            <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                                btn-default" data-dismiss="modal" value="Cancel">
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
                     </div>
                 </form>
             </div>
@@ -267,23 +228,18 @@
                     <div class="modal-header">
                         <h4 class="modal-title">Eliminar producto</h4>
 
-                        <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-hidden="true">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <input type="number" name="id"
-                            value="{{ productos.id }}" hidden>
+                        <input type="number" name="id" value="{{ productos.id }}" hidden>
 
                         <p>Estas seguro que quieres eliminar el producto</p>
-                     
+
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn
-                                btn-default"
-                            data-dismiss="modal"
-                            value="Cancel">
-                            <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                                btn-default" data-dismiss="modal" value="Cancel">
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
                     </div>
                 </form>
             </div>

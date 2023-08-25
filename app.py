@@ -365,14 +365,47 @@ def eliminar_sub():
 
     return redirect(url_for('sub'))
 
+def select_categorias():
+    categorias = {}
+
+    subcategorias = (
+        db.session.query(
+            CategoriaProducto.id.label('categoria_id'),
+            CategoriaProducto.nombre.label('categoria'),
+            SubCategoriaProducto.id.label('subcategoria_id'),
+            SubCategoriaProducto.nombre.label('subcategoria')
+        )
+        .join(SubCategoriaProducto, CategoriaProducto.id == SubCategoriaProducto.id_categoria)
+        .all()
+    )
+
+    for row in subcategorias:
+        categoria_id = row.categoria_id
+        categoria = row.categoria
+        subcategoria_id = row.subcategoria_id
+        subcategoria = row.subcategoria
+
+        if categoria_id not in categorias:
+            categorias[categoria_id] = {
+                'nombre': categoria,
+                'subcategorias': [],
+            }
+
+        categorias[categoria_id]['subcategorias'].append({
+            'id': subcategoria_id,
+            'nombre': subcategoria,
+        })
+
+    return categorias
 
 @app.route("/producto", methods=["GET", "POST"])
 @login_required
 def producto():
     
     producto = Producto.query.options(joinedload(Producto.subcategoria).joinedload(SubCategoriaProducto.categoria)).all()
-    subcategorias = SubCategoriaProducto.query.options(joinedload(SubCategoriaProducto.categoria)).all()
-    return render_template("producto.html", producto=producto,subcategorias=subcategorias)
+    categorias = select_categorias()
+    print(categorias)
+    return render_template("producto.html", producto=producto,categorias=categorias)
 
 
 @app.route("/producto_crear", methods=["GET","POST"])
