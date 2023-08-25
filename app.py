@@ -16,6 +16,8 @@ from models import *
 from helper import *
 from helper1 import *
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import outerjoin
+from sqlalchemy.orm import aliased
 from sqlalchemy.sql import exists, not_
 from twilio.rest import Client
 import cloudinary
@@ -467,17 +469,48 @@ def eliminar_producto():
 
     return redirect(url_for('producto'))
 
+def obtener_estructura_de_productos():
+    subcategoria_alias = aliased(SubCategoriaProducto)
+    productos = (
+        Producto.query
+        .options(
+            joinedload(Producto.subcategoria).joinedload(SubCategoriaProducto.categoria)
+        )
+        .outerjoin(subcategoria_alias, Producto.subcategoria)
+        .outerjoin(Precio, Producto.id == Precio.id_producto)
+        .filter(Precio.id_producto == None)
+        .all()
+    )
 
+    categorias_y_productos = {}
 
+    for producto in productos:
+        categoria_nombre = producto.subcategoria.categoria.nombre
+        subcategoria_nombre = producto.subcategoria.nombre
+        producto_nombre = producto.nombre
+        id_producto = producto.id
+
+        if categoria_nombre not in categorias_y_productos:
+            categorias_y_productos[categoria_nombre] = {'subcategorias': {}}
+
+        if subcategoria_nombre not in categorias_y_productos[categoria_nombre]['subcategorias']:
+            categorias_y_productos[categoria_nombre]['subcategorias'][subcategoria_nombre] = {'productos': []}
+
+        categorias_y_productos[categoria_nombre]['subcategorias'][subcategoria_nombre]['productos'].append({
+            'nombre': producto_nombre,
+            'id': id_producto
+        })
+
+    return categorias_y_productos
 
 
 @app.route("/precio_producto",methods=["POST","GET"])
 @login_required
 def precio_producto():
    Precios=Precio.query.options(joinedload(Precio.producto)).all()
-   productos = Producto.query.options(joinedload(Producto.subcategoria).joinedload(SubCategoriaProducto.categoria)).all()
+   categorias_y_productos = obtener_estructura_de_productos()
 
-   return render_template("precio_producto.html",Precios=Precios,productos=productos)
+   return render_template("precio_producto.html",Precios=Precios,categorias_y_productos=categorias_y_productos)
 
 
 
