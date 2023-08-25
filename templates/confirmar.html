@@ -1,172 +1,192 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/png" href="/static/img/2.png">
-        <title>LUXX ART || Productos</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/style2.css">
+{% extends "index_base.html" %}
+{% block title %} || Pedidos{% endblock %}
 
-        <link
-            href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
-            rel="stylesheet">
-
-        <link rel="stylesheet"
-            href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-            rel="stylesheet">
-        <link rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
-        <script
-            src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-        <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.6/flowbite.min.css"
-            rel="stylesheet" />
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.6/flowbite.min.js"></script>
-    </head>
-    <body>
-
-        <!----header section design---->
-        <header>
-            <a href="/" class="logo"><img src="/static/img/5.png"
-                    style="width: 10%;"></a>
-
-            <ul class="navbar">
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/acerca">Acerca de</a></li>
-                <li><a href="/shop" class="active">Productos</a></li>
-                {% if 'cliente_id' in session %}
-                <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
-                {% endif %}
-            </ul>
-
-            <div class="icons">
-
-                <div class="icons">
-                    {% if 'cliente_foto' in session %}
-                    <a href class="foto"><img
-                            src="{{session['cliente_foto']}}"
-                            class="foto" alt></a>
-                    {% else %}
-                    <a href="/login"><i class="ri-user-line"></i></a>
-                    {% endif %}
-
-                    <a href="/card"><i class="ri-shopping-cart-line"></i></a>
-                    <div class="bx bx-menu" id="menu-icon"></div>
-                </div>
+{% block main %}
+<section style="padding-top: 7rem;">
+    <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
+    </div>
+    <section class="container">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Confirmacion de pedido</h3>
             </div>
-        </header>
-        <section class="product">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
 
-            <div class="flex">
-                <div class="w-1/9">
-                    <div class="bg-white shadow-md rounded p-4">
-                        <h2 class="text-xl font-bold mb-4">Confirmacion de
-                            pedido</h2>
+                        <div class="row">
+                            <div class="col-md-6">
 
-                        <form
-                            action="/confirmar/{{confirmar.id_personalizacion}}"
-                            method="post">
-                            <div class="mb-4">
-                                <label
-                                    class="block text-gray-700 text-sm font-bold mb-2"
-                                    for="nombre">Nombre:</label>
-                                <input
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="nombre" type="text" placeholder
-                                    value="{{confirmar.personalizacion.cliente.persona.nombre}}"
-                                    disabled>
+                                <div class="post">
+                                    <div class="user-block">
+                                        <img class="round rounded-circle me-3 shadow"
+                                            src="{{confirmar.personalizacion.fotos}}" alt="user image">
+                                    </div>
+
+                                </div>
                             </div>
-                            <div class="mb-4">
-                                <label
-                                class="block text-gray-700 text-sm font-bold mb-2"
-                                for="nombre">Seleccionar opcion:</label>
-                                <select name="estado"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    id="country">
-                                    <option value="3">Aceptar</option>
-                                    <option value="4">Rechazar</option>
-                                </select>
-                                <input type="text" class="" name="id" value="{{confirmar.id_personalizacion}}" hidden>
-                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i>Detalles
+                                        del pedidos</a>
+                                </p>
+                                <p style="color:black;"><Strong>Descripcion del pedido:</Strong> <br>
+                                    {{confirmar.personalizacion.descripcion}} </p>
+                                <br>
+                                <hr>
+                                <p style="color: black;">
+                                    <strong>Presupuesto:</strong>C${{confirmar.personalizacion.presupuesto}}
+                                </p>
+                                <br>
 
-                            <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                type="submit">
-                                Enviar
-                            </button>
-                        </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                        <h3 class="text-secondary"><i class="fas fa-paint-brush"></i>Observaciones sobre el pedido</h3>
+                        <p class="" style="color: black;">
+                            {{confirmar.nota}}
+                        </p>
+                        <br>
+                        <div class="text-dark">
+                            <p class="text-sm ">Costo de la personalizacion
+                                <b class="d-block">C$: {{confirmar.costo_total}}</b>
+                            </p>
+                            <p class="text-sm">Fecha de entrega:
+                                <b class="d-block">{{confirmar.fecha_entrega}}</b>
+                            </p>
+                        </div>
+                        <h5 class="mt-5">Confirmar pedido</h5>
+                        <ul class="list-unstyled">
+                            <form action="">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Selecione una opcion</label>
+                                        <select name="estado" id="estado" class="form-select">
+                                            <option value="0">Elegir una selecion</option>
+                                            <option value="3">Confirmar</option>
+                                            <option value="4">Rechazar</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-success">Enviar respuesta</button>
+
+                            </form>
+                        </ul>
 
                     </div>
                 </div>
-                <div class="w-1/1">
-                </div>
-                <div class=" mx-auto w-1/2">
-                    <div class="bg-white shadow-md rounded p-4">
-                        <h2 class="text-xl font-bold mb-4">Descripcion</h2>
-                        <div class="bg-gray-100 p-4">
-                            <p><strong>Notas:</strong>{{confirmar.nota}}</p>
-                            <p><strong>Presupuesto propuesto:</strong>C${{confirmar.personalizacion.presupuesto}}</p>
-                            <p><strong>Costo total</strong>C${{confirmar.costo_total}}</p>
-                            <p><Strong>Fecha de entrega:</Strong>{{confirmar.fecha_entrega}}</p>
+
+            </div>
+            <!-- /.card-body -->
+            <div id="seleccionar" style="display: none;">
+
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <!-- Default checked radio -->
+                        <div class="form-check h-100 border rounded-3">
+                            <div class="p-3">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    id="flexRadioDefault1" />
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Por correo<br />
+                                    <small class="text-muted">2-10 dias por correo</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <!-- Default radio -->
+                        <div class="form-check h-100 border rounded-3">
+                            <div class="p-3">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    id="flexRadioDefault2" />
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    Casimiro Sotelo <br />
+                                    <small class="text-muted">5-7 dias para la entrega </small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <!-- Default radio -->
+                        <div class="form-check h-100 border rounded-3">
+                            <div class="p-3">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    id="flexRadioDefault2" />
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    UNI RUSB <br />
+                                    <small class="text-muted">5-7 dias para la entrega </small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <!-- Default radio -->
+                        <div class="form-check h-100 border rounded-3">
+                            <div class="p-3">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    id="flexRadioDefault2" />
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    MASAYA <br />
+                                    <small class="text-muted">5-7 dias para la entrega </small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <!-- Default radio -->
+                        <div class="form-check h-100 border rounded-3">
+                            <div class="p-3">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    id="flexRadioDefault2" />
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    Metrocentro <br />
+                                    <small class="text-muted">5-7 dias para la entrega </small>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-        </section>
-
-        <section class="contact">
-            <div class="main-contact">
-                <div class="contact-content">
-                    <h5>Navegacion</h5>
-                    <ul>
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="/acerca">Acerca de</a></li>
-                        <li><a href="/producto">Productos</a></li>
-                    </ul>
+            <div class="row" id="mostrar" style="display: none;">
+                <div class="col-md-12 mb-3 ">
+                    <p class="mb-0">Direccion</p>
+                    <div class="form-outline">
+                        <textarea name="direccion" id="direccion" cols="30" rows="5" class="form-control"></textarea>
+                    </div>
                 </div>
-
-                <div class="contact-content">
-                    <h5>Redes sociales</h5>
-                    <ul>
-                        <li><a href="https://www.instagram.com/luxx.art.cfts/"
-                                target="_blank">Instragram</a></li>
-                        <li><a href="https://www.facebook.com/gomez.1624"
-                                target="_blank">Facebook</a></li>
-                        <li><a href>Whatsapp</a></li>
-
-                    </ul>
-
-                </div>
-
-                <div class="contact-content">
-                    <h5>Politicas y privacidad</h5>
-                    <ul>
-                        <li><a href="#">Politicas y privacidad</a></li>
-                        <li><a href="#">Termino y condiciones</a></li>
-                        <li><a href="#">Cokies</a></li>
-
-                    </ul>
-
-                </div>
-
             </div>
-        </section>
-
-        <div class="end-text">
-            <p>© 2023 All Rights Reserved by Luxx ART</p>
         </div>
+    </section>
+    <script>
+        const estadoSelect = document.getElementById('estado');
+        const contenidoConfirmar = document.getElementById('seleccionar');
 
-        <script src="https://unpkg.com/scrollreveal"></script>
+        estadoSelect.addEventListener('change', function () {
+            if (estadoSelect.value === '3') {
+                contenidoConfirmar.style.display = 'block';
+            } else {
+                contenidoConfirmar.style.display = 'none';
+            }
+        });
+    </script>
 
-        <script type="text/javascript"
-            src="{{url_for('static', filename= 'js/script.js')}}"></script>
+    <script>
+        const radioButtons = document.getElementsByName('flexRadioDefault');
+        const divMostrar = document.getElementById('mostrar');
 
-    </body>
-</html>
+        radioButtons.forEach(radioButton => {
+            radioButton.addEventListener('change', () => {
+                if (radioButton.id === 'flexRadioDefault1' && radioButton.checked) {
+                    divMostrar.style.display = 'block';
+                } else {
+                    divMostrar.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    {% endblock %}

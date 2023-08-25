@@ -118,7 +118,8 @@ CREATE TABLE detalle_personalizacion(
     id_personalizacion INTEGER REFERENCES personalizacion(id),
     costo_total NUMERIC,
     nota TEXT,
-    fecha_entrega DATE
+    fecha_entrega DATE,
+    tipo_entrega VARCHAR(5000)
     
 );
 
@@ -140,6 +141,7 @@ CREATE TABLE venta(
     codigo VARCHAR(100),
     tipo_entrega VARCHAR(5000),
     fecha DATE,
+    fecha_entrega DATE,
     estado INTEGER
 );
 

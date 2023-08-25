@@ -4,7 +4,7 @@ import random
 from user_agents import parse
 from decimal import Decimal
 import string
-from flask import Flask, session, redirect, url_for, render_template, request, flash,jsonify
+from flask import Flask, send_file, session, redirect, url_for, render_template, request, flash,jsonify
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -250,8 +250,6 @@ def pedido(id):
             .options(joinedload(DetalleVenta.venta))
             .filter(DetalleVenta.venta.has(id_cliente=id))
             .all())
-    print(pedidos)
-    print(ventas)
     return render_template("pedidos.html")
 
 #Gestion de productos
@@ -1628,14 +1626,12 @@ def personalizacion():
 @login_required
 def personalizaciones():
     cantidad_pedidos = Personalizacion.query.filter(Personalizacion.estado == 0).count()
-    pedido=Personalizacion.query.filter(Personalizacion.estado == 0).all()
+    pedido=Personalizacion.query.filter(Personalizacion.estado == 0).order_by(Personalizacion.id).all()
     rechazados=Personalizacion.query.filter(Personalizacion.estado == 1).all()
     enviados=DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2).all()
     detalle_pedidos = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 3).all()
-
-
-   
-    return render_template("personalizacion.html",pedido=pedido, cantidad_pedidos=cantidad_pedidos,rechazados=rechazados,detalle_pedidos=detalle_pedidos,enviados=enviados)
+    fecha_actual = datetime.now().date()
+    return render_template("personalizacion.html",pedido=pedido, cantidad_pedidos=cantidad_pedidos,rechazados=rechazados,detalle_pedidos=detalle_pedidos,enviados=enviados,fecha_actual=fecha_actual)
 
 
 
@@ -1701,7 +1697,7 @@ def detalle_pedidos():
             personalizacion.estado=2
             db.session.add(personalizacion)
             db.session.commit()
-            detalle=DetallePersonalizacion(id_personalizacion=id, costo_total=costo_total, nota=nota, fecha_entrega=fecha_entrega)
+            detalle=DetallePersonalizacion(id_personalizacion=id, costo_total=costo_total, nota=nota, fecha_entrega=fecha_entrega,tipo_entrega='')
             db.session.add(detalle)
             db.session.commit()
             mensaje=f'''Estimado(a) {nombre},
@@ -1741,16 +1737,19 @@ def confirmar(id):
         return render_template("confirmar.html", confirmar=confirmar)
     if request.method == "POST":
         id_personalizacion = request.form.get('id')
+        tipo_entrega=request.form.get('tipo_entrega')
         estado = int(request.form.get('estado'))
         personalizacion = Personalizacion.query.get(id_personalizacion)
+        detalle=DetallePersonalizacion.query.get(id_personalizacion)
         if personalizacion is not None:
             # Realiza las acciones necesarias con la personalización
             # según si se acepta o se rechaza
-            print(estado)
             if  estado == 3:
                 # Acciones cuando se acepta
                 personalizacion.estado = 3
                 db.session.add(personalizacion)
+                detalle.tipo_entrega=tipo_entrega
+                db.session.add(detalle)
                 db.session.commit()
                 flash('La confirmación se ha realizado correctamente.', 'success')
                 return redirect('/shop')
@@ -1759,7 +1758,7 @@ def confirmar(id):
                 personalizacion.estado = 4
                 db.session.add(personalizacion)
                 db.session.commit()
-                flash('La confirmación se ha realizado correctamente.', 'success')
+                flash('Se ha rechazado correctamente el pedido.', 'success')
                 return redirect('/shop')
 
        
@@ -1837,6 +1836,8 @@ def crear_venta_pedido():
         id_cliente= request.form.get('id_cliente')
         costo_total=request.form.get('costo_total')
         descuento=request.form.get('descuento')
+        if descuento == '':
+            descuento=0
         ultima_venta = Venta.query.order_by(Venta.id.desc()).first()
         fecha_actual = date.today()
         total  = int(costo_total) - int(descuento)
@@ -1864,6 +1865,7 @@ def crear_venta_pedido():
         return redirect('/ventas')
     
     return redirect('ventas')
+
 def calcular_total_con_descuento(subtotal, descuento):
     subtotal = Decimal(subtotal)
     descuento = Decimal(descuento)

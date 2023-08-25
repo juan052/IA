@@ -279,14 +279,16 @@ class DetallePersonalizacion(db.Model):
     costo_total = db.Column(db.Numeric)
     nota = db.Column(db.Text)
     fecha_entrega = db.Column(db.Date)
+    tipo_entrega=db.Column(db.String(5000))
 
     personalizacion = db.relationship('Personalizacion')
 
-    def __init__(self, id_personalizacion, costo_total, nota, fecha_entrega):
+    def __init__(self, id_personalizacion, costo_total, nota, fecha_entrega,tipo_entrega):
         self.id_personalizacion = id_personalizacion
         self.costo_total = costo_total
         self.nota = nota
         self.fecha_entrega = fecha_entrega
+        self.tipo_entrega=tipo_entrega
 
 class Venta(db.Model):
     __tablename__ = 'venta'
@@ -297,16 +299,18 @@ class Venta(db.Model):
     fecha = db.Column(db.Date)
     codigo=db.Column(db.String(250))
     tipo_entrega=db.Column(db.String(500))
+    fecha_entrega=db.Column(db.DATE)
     estado = db.Column(db.Integer)
     tipo_venta = relationship('TipoVenta')
     cliente = relationship('Cliente')
 
-    def __init__(self, id_tipo, id_cliente, fecha,codigo,tipo_entrega, estado):
+    def __init__(self, id_tipo, id_cliente, fecha,codigo,tipo_entrega,fecha_entrega, estado):
         self.id_tipo = id_tipo
         self.id_cliente = id_cliente
         self.fecha = fecha
         self.codigo=codigo
         self.tipo_entrega=tipo_entrega
+        self.fecha_entrega=fecha_entrega
         self.estado = estado
 
 
