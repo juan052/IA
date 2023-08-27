@@ -1306,17 +1306,9 @@ def guardar_venta():
         codigo = "V-00" + str(id_venta) 
         tipo_entrega=request.form.get('flexRadioDefault')
         direccion=request.form.get('direccion')
-        print(direccion)
-        print("-----------------------------","codigo de venta", codigo)
-        print("fecha:",fecha_postgresql,"------------", "Tipo de venta:",id_tipo)
-        print("------------------------------")
-        print("Cliente:", id_cliente)
-        print("------------------------------------------------------")
-        print("------Tipo de entrega---------------")
-        print("Lugar de entrega:",tipo_entrega)
-        print("----------------------------------")
-        lugar=tipo_entrega+" "+ direccion
-        venta = Venta(id_tipo=1, id_cliente=id_cliente, fecha=fecha_postgresql,codigo=codigo,tipo_entrega=lugar, estado=1,fecha_entrega=fecha)
+        total=request.form.get('total')
+        lugar = str(tipo_entrega) + " " + str(direccion)
+        venta = Venta(id_tipo=1, id_cliente=id_cliente, fecha=fecha_postgresql,codigo=codigo,tipo_entrega=lugar,descuento=0,total=total,  estado=1,fecha_entrega=fecha)
         db.session.add(venta)
         db.session.commit()   
         
@@ -1325,9 +1317,10 @@ def guardar_venta():
         for detalle in detalles:
             id_producto = detalle['id']
             subtotal = detalle['precio'] * detalle['cantidad']
-            descuento = 0
-            total = subtotal - descuento
-            detalle_venta = DetalleVenta(id_venta=venta.id, id_producto=id_producto, subtotal=subtotal, descuento=descuento, total=total)
+            cantidad=detalle['cantidad']
+            precio=detalle['precio']
+
+            detalle_venta = DetalleVenta(id_venta=venta.id, id_producto=id_producto,precio_unitario=precio,cantidad=cantidad, subtotal=subtotal)
             db.session.add(detalle_venta)
         
         db.session.commit()
@@ -1951,8 +1944,8 @@ def crear_venta_pedidos():
         venta=Venta.query.get(id)
         venta.estado=2
         venta.fecha_entrega=fecha_entrega
-        db.session.add(venta)
-        db.session.commit()
+       
+       
         if descuento is None or not descuento.strip():
             descuento = Decimal('0.00')
         else:
@@ -1960,13 +1953,13 @@ def crear_venta_pedidos():
                 descuento = Decimal(descuento)
             except InvalidOperation:
                 return "No se puede convertir"
-       
-        detalles_venta = DetalleVenta.query.filter_by(id_venta=id).all()
-        for detalle in detalles_venta:
-            detalle.descuento = descuento
-            detalle.total = calcular_total_con_descuento(detalle.subtotal, descuento)  # Aquí debes implementar tu lógica para calcular el total con descuento
-            db.session.add(detalle)
-
+            
+        nuevo_total=calcular_total_con_descuento(venta.total,descuento)
+        venta.estado=2
+        venta.descuento=descuento
+        venta.fecha_entrega=fecha_entrega
+        venta.total=nuevo_total
+        db.session.add(venta)
         db.session.commit()
 
       

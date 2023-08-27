@@ -24,6 +24,7 @@ respuestas = {
     "adiós": "Hasta luego. ¡Que tengas un buen día!",
     "productos": "",
     "categoría": "",
+    "mujeres":"Somos todas mentirosa mas Alison Hernandez  sobre todo",
     "qué puedo comprar": "Ofrecemos una variedad de productos desde collares, pulseras personalización de cover y lienzo y más"
 }
 

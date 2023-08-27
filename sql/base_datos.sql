@@ -138,10 +138,12 @@ CREATE TABLE venta(
     id SERIAL PRIMARY KEY,
     id_tipo INTEGER REFERENCES tipo_venta(id),
     id_cliente INTEGER REFERENCES clientes(id),
-    codigo VARCHAR(100),
+    codigo VARCHAR(255),
     tipo_entrega VARCHAR(5000),
     fecha DATE,
     fecha_entrega DATE,
+    descuento NUMERIC NOT NULL,
+    total NUMERIC NOT NULL,
     estado INTEGER
 );
 
@@ -151,27 +153,24 @@ CREATE TABLE detalle_venta
     id SERIAL PRIMARY KEY,
     id_venta INTEGER REFERENCES venta(id),
     id_producto INTEGER REFERENCES producto(id),
-    subtotal numeric NOT NUll,
-    descuento NUMERIC NOT NULL,
-    total NUMERIC NOT NULL
+    precio_unitario NUMERIC NOT NULL,
+    cantidad INTEGER NOT NULL,
+    subtotal numeric NOT NULL
 );
 
 CREATE TABLE venta_personalizacion(
     id SERIAL PRIMARY KEY,
     id_venta INTEGER REFERENCES venta(id),
     id_personalizacion INTEGER REFERENCES personalizacion(id),
-    subtotal numeric NOT NUll,
-    descuento NUMERIC NOT NULL,
-    total NUMERIC NOT NULL
+    descripcion VARCHAR(255),
+    subtotal numeric NOT NULL,
+    cantidad INTEGER
 );
-
 CREATE TABLE venta_servicios(
     id SERIAL PRIMARY KEY,
     id_venta INTEGER REFERENCES venta(id),
     id_reservacion INTEGER REFERENCES servicios(id),
-    subtotal numeric NOT NUll,
-    descuento NUMERIC NOT NULL,
-    total NUMERIC NOT NULL
+    subtotal numeric NOT NUll 
 );
 
 CREATE TABLE modulo(

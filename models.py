@@ -300,17 +300,21 @@ class Venta(db.Model):
     codigo=db.Column(db.String(250))
     tipo_entrega=db.Column(db.String(500))
     fecha_entrega=db.Column(db.DATE)
+    descuento = db.Column(db.Numeric, nullable=False)
+    total = db.Column(db.Numeric, nullable=False)
     estado = db.Column(db.Integer)
     tipo_venta = relationship('TipoVenta')
     cliente = relationship('Cliente')
 
-    def __init__(self, id_tipo, id_cliente, fecha,codigo,tipo_entrega,fecha_entrega, estado):
+    def __init__(self, id_tipo, id_cliente, fecha,codigo,tipo_entrega,fecha_entrega,descuento,total, estado):
         self.id_tipo = id_tipo
         self.id_cliente = id_cliente
         self.fecha = fecha
         self.codigo=codigo
         self.tipo_entrega=tipo_entrega
         self.fecha_entrega=fecha_entrega
+        self.descuento = descuento
+        self.total = total
         self.estado = estado
 
 
@@ -320,17 +324,19 @@ class DetalleVenta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_venta = db.Column(db.Integer, db.ForeignKey('venta.id'))
     id_producto = db.Column(db.Integer, db.ForeignKey('producto.id'))
+    precio_unitario=db.Column(db.Numeric)
+    cantidad=db.Column(db.Integer)
     subtotal = db.Column(db.Numeric, nullable=False)
-    descuento = db.Column(db.Numeric, nullable=False)
-    total = db.Column(db.Numeric, nullable=False)
+
     producto = relationship('Producto')
     venta = relationship('Venta')
-    def __init__(self, id_venta, id_producto, subtotal, descuento, total):
+    def __init__(self, id_venta, id_producto,precio_unitario,cantidad, subtotal):
         self.id_venta = id_venta
         self.id_producto = id_producto
+        self.precio_unitario=precio_unitario
+        self.cantidad=cantidad
         self.subtotal = subtotal
-        self.descuento = descuento
-        self.total = total
+        
 
 class VentaPersonalizacion(db.Model):
     __tablename__ = 'venta_personalizacion'
@@ -338,19 +344,16 @@ class VentaPersonalizacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_venta = db.Column(db.Integer, db.ForeignKey('venta.id'))
     id_personalizacion = db.Column(db.Integer, db.ForeignKey('personalizacion.id'))
+    cantidad=db.Column(db.Integer)
     subtotal = db.Column(db.Numeric, nullable=False)
-    descuento = db.Column(db.Numeric, nullable=False)
-    total = db.Column(db.Numeric, nullable=False)
-
     venta = relationship('Venta')
     personalizacion = relationship('Personalizacion')
 
-    def __init__(self, id_venta, id_personalizacion, subtotal, descuento, total):
+    def __init__(self, id_venta, id_personalizacion,cantidad, subtotal):
         self.id_venta = id_venta
         self.id_personalizacion = id_personalizacion
+        self.cantidad = cantidad
         self.subtotal = subtotal
-        self.descuento = descuento
-        self.total = total
 
 
 class VentaServicios(db.Model):
@@ -359,19 +362,19 @@ class VentaServicios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_venta = db.Column(db.Integer, db.ForeignKey('venta.id'))
     id_reservacion = db.Column(db.Integer, db.ForeignKey('servicios.id'))
+    cantidad=db.Column(db.Integer)
     subtotal = db.Column(db.Numeric, nullable=False)
-    descuento = db.Column(db.Numeric, nullable=False)
-    total = db.Column(db.Numeric, nullable=False)
+    
 
     venta = relationship('Venta')
     reservacion = relationship('Servicio')
 
-    def __init__(self, id_venta, id_reservacion, subtotal, descuento, total):
+    def __init__(self, id_venta, id_reservacion,cantidad, subtotal):
         self.id_venta = id_venta
         self.id_reservacion = id_reservacion
+        self.cantidad=cantidad
         self.subtotal = subtotal
-        self.descuento = descuento
-        self.total = total
+        
 class Modulo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(250))
