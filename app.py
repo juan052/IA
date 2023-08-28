@@ -2039,7 +2039,7 @@ def crear_cat_preguntas():
     categorias=CatPregunta(categoria=categoria)
     db.session.add(categorias)
     db.session.commit()
-    flash("Se ha creado la categoria","succes")
+    flash("Se ha creado la categoria","success")
     return redirect("/cat_preguntas")
 
 @app.route("/actualizar_cat_preguntas/<int:id>",methods=["GET","POST"])
