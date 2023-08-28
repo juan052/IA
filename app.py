@@ -242,7 +242,7 @@ def cambiar_contraseñas():
 @app.route("/pedido/<int:id>", methods=["GET","POST"])
 @login_requirede
 def pedido(id):
-    cliente=Clientes.query.get(id)
+    cliente=Cliente.query.get(id)
     id=cliente.id
     pedidos = (
     DetallePersonalizacion.query
@@ -253,6 +253,7 @@ def pedido(id):
             .options(joinedload(DetalleVenta.venta))
             .filter(DetalleVenta.venta.has(id_cliente=id))
             .all())
+    print(ventas)
     return render_template("pedidos.html")
 
 #Gestion de productos
@@ -805,9 +806,12 @@ def eliminar_salario():
 @login_required
 def usuarios():
     
-    usuarios = Usuario.query.order_by(Usuario.id_grupo).all()
+    usuarios = Usuario.query.filter(Usuario.id_grupo != 2).order_by(Usuario.id_grupo).all()
     trabajadores = Trabajador.query.outerjoin(Usuario, and_(Usuario.id_persona == Trabajador.id_persona)).filter(Usuario.id_persona.is_(None)).all()
-    
+    for usuario in usuarios:
+        print("ID:", usuario.id)
+        print("Nombre:", usuario.usuario)
+        print("ID Grupo:", usuario.id_grupo)
 
     return render_template("usuarios.html", trabajadores=trabajadores,usuarios=usuarios)
 
@@ -1582,29 +1586,34 @@ def actualizar_cliente(id):
         direccion = request.form.get("direccion")
         estado=request.form.get("estado")
         logo = cliente.foto
+        secure_url = None
         if 'foto' in request.files:
             archivo_foto = request.files['foto']
             if archivo_foto:
                 try:
                     if logo:
-                                # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
+                        # Obtén el public_id de Cloudinary desde la URL de la imagen anterior
                         public_id_anterior = logo.split('/')[-1].split('.')[0]
-                                # Intenta eliminar la imagen anterior de Cloudinary
+                        # Intenta eliminar la imagen anterior de Cloudinary
                         try:
-                                cloudinary.api.delete_resources_by_prefix(public_id_anterior)
+                            cloudinary.api.delete_resources_by_prefix(public_id_anterior)
                         except cloudinary.exceptions.Error as delete_error:
-                                print(f"Error al eliminar la imagen anterior: {delete_error}")
+                            print(f"Error al eliminar la imagen anterior: {delete_error}")
 
-                            # Subir y transformar la nueva imagen
-                        result = cloudinary.uploader.upload(archivo_foto,transformation={"width": 300, "height": 300})
-                        secure_url = result["secure_url"]
+                    # Subir y transformar la nueva imagen
+                    result = cloudinary.uploader.upload(archivo_foto, transformation={"width": 300, "height": 300})
+                    secure_url = result["secure_url"]
                 except cloudinary.exceptions.Error as upload_error:
                     flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
-                    return redirect('/servicios')  
+
+        # Resto de tu código...
+
+      
+                    return redirect('/clientes')  
 
                     
        
-        # Actualizar los datos del cliente existente
+        # Actualizar los datos del cliente exisstente
         cliente.persona.nombre = nombre
         cliente.persona.correo = email
         cliente.persona.direccion = direccion
@@ -2093,5 +2102,76 @@ def actualizar_preguntas(id):
     db.session.add(preguntas)
     db.session.commit()
     flash("Se ha actualizado correctamente la pregunta","success")
-    
+    imprimir()
     return redirect("/preguntas")
+
+
+@app.route("/api", methods=["GET"])
+def api():
+    # Realizar la consulta usando el ORM
+    consulta = (
+        db.session.query(CatPregunta.categoria.label('tag'), Pregunta.pregunta, Pregunta.respuesta)
+        .join(Pregunta, CatPregunta.id == Pregunta.id_cat)
+        .order_by(CatPregunta.categoria)  # Ordenar por categoría
+        .all()
+    )
+
+    # Estructura para almacenar los intents
+    intents = {}
+
+    # Iterar sobre los resultados
+    for resultado in consulta:
+        tag = resultado.tag
+        pregunta = resultado.pregunta
+        respuesta = resultado.respuesta
+
+        # Agregar tag si no existe
+        if tag not in intents:
+            intents[tag] = {
+                'tag': tag,
+                'patterns': [],
+                'responses': []
+            }
+
+        # Agregar pattern y response al tag
+        intents[tag]['patterns'].append(pregunta)
+        intents[tag]['responses'].append(respuesta)
+
+    # Crear la lista de intents a partir del diccionario
+    intents_list = []
+
+    # Reorganizar la estructura de intents para tener el tag primero
+    for tag, data in intents.items():
+        intents_list.append(data)
+
+    # Crear la estructura final
+    data = {
+        'intents': intents_list
+    }
+    intents_list = data['intents']
+
+# Iterar sobre los intents
+    for intent in intents_list:
+        tag = intent['tag']
+        patterns = intent['patterns']
+        responses = intent['responses']
+
+        print(f"Tag: {tag}")
+        print("Patterns:", patterns)
+        print("Responses:", responses)
+        print("------------------------")
+
+    return jsonify(data)
+
+def imprimir():
+# Convertir el diccionario en una respuesta JSON
+    import json
+
+    # Supongamos que la función api() devuelve el JSON generado
+    json_data = api()
+
+    # Convierte la estructura JSON en una cadena formateada
+    json_str = json.dumps(json_data, indent=2)
+
+    # Imprime la cadena en la consola
+    return print(json_str)
