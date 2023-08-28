@@ -427,3 +427,25 @@ class Conexion(db.Model):
         self.dispostivo=dispostivo
         self.version_dispositivos=version_dispositivos
         self.estado = estado
+
+class CatPregunta(db.Model):
+    __tablename__ = 'catpregunta'
+    id = db.Column(db.Integer, primary_key=True)
+    categoria=db.Column(db.String(250),nullable=False)
+   
+
+    def __init__(self,categoria):
+        self.categoria=categoria
+
+
+class Pregunta(db.Model):
+    __tablename__ = 'pregunta'
+    id = db.Column(db.Integer, primary_key=True)
+    id_cat= db.Column(db.Integer, db.ForeignKey('catpregunta.id'))
+    pregunta=db.Column(db.String(250),nullable=False)
+    respuesta=db.Column(db.Text(15000),nullable=False)
+    catpregunta=relationship('CatPregunta')
+    def __init__(self,id_cat,pregunta,respuesta):
+        self.id_cat=id_cat
+        self.pregunta=pregunta
+        self.respuesta=respuesta

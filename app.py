@@ -2024,4 +2024,74 @@ def enviar_correo():
         print( "Error al enviar el correo: " + str(e))
         flash("No se pudo enviar el correo","error")
         return redirect('/contacto')
+
+@app.route("/cat_preguntas",methods=["GET","POST"])
+@login_required
+def cat_preguntas():
+    preguntas=CatPregunta.query.all()
+
+    return render_template("cat_preguntas.html",preguntas=preguntas)
+
+@app.route("/crear_cat_preguntas",methods=["GET","POST"])
+@login_required
+def crear_cat_preguntas():
+    categoria=request.form.get("pregunta")
+    categorias=CatPregunta(categoria=categoria)
+    db.session.add(categorias)
+    db.session.commit()
+    flash("Se ha creado la categoria","succes")
+    return redirect("/cat_preguntas")
+
+@app.route("/actualizar_cat_preguntas/<int:id>",methods=["GET","POST"])
+@login_required
+def actualizar_cat_preguntas(id):
+    categorias=request.form.get("preguntas")
+    print(categorias)
+
+    categoria=CatPregunta.query.get(id)
+    categoria.categoria=categorias
+    db.session.add(categoria)
+    db.session.commit()
+    flash("Se ha actualizado correctamente","success")
+    return redirect("/cat_preguntas")
+
+@app.route("/preguntas",methods=["GET","POST"])
+@login_required
+def preguntas():
+    categorias=CatPregunta.query.all()
+    preguntas = Pregunta.query.options(joinedload(Pregunta.catpregunta)).all()
+
+
+    return render_template("preguntas.html",preguntas=preguntas,categorias=categorias)
+
+
+
+@app.route("/crear_preguntas",methods=["GET","POST"])
+@login_required
+def crear_preguntas():
+    categoria=request.form.get("categoria")
+    pregunta=request.form.get("pregunta")
+    responder=request.form.get("responder")
+    print(responder)
+    preguntas=Pregunta(id_cat=categoria,pregunta=pregunta,respuesta=responder)
+    db.session.add(preguntas)
+    db.session.commit() 
+    flash("Se ha registrado con exito la pregunta","success")
+    return redirect("/preguntas")
+
+@app.route("/actualizar_preguntas//<int:id>",methods=["GET","POST"])
+@login_required
+def actualizar_preguntas(id):
+    categoria=request.form.get("categoria")
+    pregunta=request.form.get("pregunta")
+    respuesta=request.form.get("respuesta")
+
+    preguntas=Pregunta.query.get(id)
+    preguntas.id_cat=categoria
+    preguntas.pregunta=pregunta
+    preguntas.respuesta=respuesta
+    db.session.add(preguntas)
+    db.session.commit()
+    flash("Se ha actualizado correctamente la pregunta","success")
     
+    return redirect("/preguntas")

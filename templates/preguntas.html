@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %} || Asistente{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block main %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Asistente virtual</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Gestion de Asistente virtual</a></li>
+                    <li class="breadcrumb-item active">Preguntas frecuentes</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Preguntas</h3>
+                        <div class="align-content-end text-right">
+                            <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                data-target="#modal-default">Agregar
+                                Preguntas</button>
+                        </div>
+
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Categoria</th>
+                                    <th>Pregunta</th>
+                                    <th>Respuesta</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for preguntas in preguntas %}
+                                <tr>
+                                    <th>{{loop.index}}</th>
+                                    <th>{{ preguntas.catpregunta.categoria }}</th>
+                                    <td>{{
+                                        preguntas.pregunta
+                                        }}</td>
+                                    <td>{{ preguntas.respuesta }}</td>
+
+                                    <td>
+                                        <a href="#modal-default{{preguntas.id}}" class="edit" data-toggle="modal">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                     
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal HTML -->
+    <div id="modal-default" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/crear_preguntas" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Crear preguntas</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Categoria:</label>
+                            <select name="categoria" id="" class="form-control select2bs4">
+                                {% for categorias in categorias %}
+                                <option value="{{categorias.id}}">{{categorias.categoria}}</option>
+
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Pregunta:</label>
+                            <input type="text" name="pregunta" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Respuesta</label>
+                            <textarea name="responder" class="form-control" required></textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn
+                                btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn
+                                btn-success" value="Add">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% for preguntas in preguntas %}
+    <!-- Edit Modal HTML -->
+    <div id="modal-default{{preguntas.id}}" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/actualizar_preguntas/{{preguntas.id}}" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Editar preguntas</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <dv class="form-group">
+                            <label for="">Categoria</label>
+                            <select name="categoria" class="form-control select2bs4" id="">
+                                {% for categorias in categorias %}
+                                <option value="{{ categorias.id }}" {% if categorias.id==preguntas.id_cat
+                                    %}selected{% endif %}>
+                                    {{ categorias.categoria }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </dv>
+                        <div class="form-group">
+                            <label>Pregunta</label>
+                            <input type="text" name="pregunta" class="form-control" required
+                                value="{{preguntas.pregunta}}">
+                        </div>
+                        <div class="form-group">
+                            <label>descripcion</label>
+                            <textarea name="respuesta" class="form-control"
+                                required>{{preguntas.respuesta}}</textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn
+                                btn-default" data-dismiss="modal" value="Cancel">
+                        <button type="submit" class="btn btn-outline-light">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+</section>
+{% endblock %}
