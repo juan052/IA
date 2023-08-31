@@ -6,162 +6,200 @@
     <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
     </div>
     <section class="container">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Confirmacion de pedido</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+        <form action="/confirmar/{{confirmar.personalizacion.id}}" method="post">
+            <input type="text" value="{{confirmar.personalizacion.id}}" name="id">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Confirmacion de pedido</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
 
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
 
-                                <div class="post">
-                                    <div class="user-block">
-                                        <img class="round rounded-circle me-3 shadow"
-                                            src="{{confirmar.personalizacion.fotos}}" alt="user image">
+                                    <div class="post">
+                                        <div class="user-block">
+                                            <img class="round rounded-circle me-3 shadow"
+                                                src="{{confirmar.personalizacion.fotos}}" alt="user image">
+                                        </div>
+
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i>Detalles
+                                            del pedidos</a>
+                                    </p>
+                                    <p style="color:black;"><Strong>Descripcion del pedido:</Strong> <br>
+                                        {{confirmar.personalizacion.descripcion}} </p>
+                                    <br>
+                                    <hr>
+                                    <p style="color: black;">
+                                        <strong>Presupuesto:</strong>C${{confirmar.personalizacion.presupuesto}}
+                                    </p>
+                                    <br>
 
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <p>
-                                    <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i>Detalles
-                                        del pedidos</a>
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                            <h3 class="text-secondary"><i class="fas fa-paint-brush"></i>Observaciones sobre el pedido
+                            </h3>
+                            <p class="" style="color: black;">
+                                {{confirmar.nota}}
+                            </p>
+                            <br>
+                            <div class="text-dark">
+                                <p class="text-sm ">Costo de la personalizacion
+                                    <b class="d-block">C$: {{confirmar.costo_total}}</b>
                                 </p>
-                                <p style="color:black;"><Strong>Descripcion del pedido:</Strong> <br>
-                                    {{confirmar.personalizacion.descripcion}} </p>
-                                <br>
-                                <hr>
-                                <p style="color: black;">
-                                    <strong>Presupuesto:</strong>C${{confirmar.personalizacion.presupuesto}}
+                                <p class="text-sm">Fecha de entrega:
+                                    <b class="d-block">{{confirmar.fecha_entrega}}</b>
                                 </p>
-                                <br>
-
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
-                        <h3 class="text-secondary"><i class="fas fa-paint-brush"></i>Observaciones sobre el pedido</h3>
-                        <p class="" style="color: black;">
-                            {{confirmar.nota}}
-                        </p>
-                        <br>
-                        <div class="text-dark">
-                            <p class="text-sm ">Costo de la personalizacion
-                                <b class="d-block">C$: {{confirmar.costo_total}}</b>
-                            </p>
-                            <p class="text-sm">Fecha de entrega:
-                                <b class="d-block">{{confirmar.fecha_entrega}}</b>
-                            </p>
-                        </div>
-                        <h5 class="mt-5">Confirmar pedido</h5>
-                        <ul class="list-unstyled">
-                            <form action="">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Selecione una opcion</label>
-                                        <select name="estado" id="estado" class="form-select">
-                                            <option value="0">Elegir una selecion</option>
-                                            <option value="3">Confirmar</option>
-                                            <option value="4">Rechazar</option>
-                                        </select>
+                            <h5 class="mt-5">Confirmar pedido</h5>
+                            <ul class="list-unstyled">
+                                <form action="">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Selecione una opcion</label>
+                                            <select name="estado" id="estado" class="form-select">
+                                                <option value="0">Elegir una selecion</option>
+                                                <option value="3">Confirmar</option>
+                                                <option value="4">Rechazar</option>
+                                            </select>
+                                        </div>
+
                                     </div>
+                                    <br>
+                                    <button type="submit" class="btn btn-success">Enviar respuesta</button>
 
+                                </form>
+                            </ul>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+                <div id="seleccionar" style="display: none;">
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <!-- Default checked radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault1" value="Servicio de correo" />
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Por correo<br />
+                                        <small class="text-muted">2-10 dias por correo</small>
+                                    </label>
                                 </div>
-                                <br>
-                                <button type="submit" class="btn btn-success">Enviar respuesta</button>
-
-                            </form>
-                        </ul>
-
-                    </div>
-                </div>
-
-            </div>
-            <!-- /.card-body -->
-            <div id="seleccionar" style="display: none;">
-
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <!-- Default checked radio -->
-                        <div class="form-check h-100 border rounded-3">
-                            <div class="p-3">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault1" />
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Por correo<br />
-                                    <small class="text-muted">2-10 dias por correo</small>
-                                </label>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <!-- Default radio -->
-                        <div class="form-check h-100 border rounded-3">
-                            <div class="p-3">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault2" />
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Casimiro Sotelo <br />
-                                    <small class="text-muted">5-7 dias para la entrega </small>
-                                </label>
+                        <div class="col-md-6 mb-3">
+                            <!-- Default radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" value="Universidad Casmiro Sotelo" />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Casimiro Sotelo <br />
+                                        <small class="text-muted">5-7 dias para la entrega </small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <!-- Default radio -->
-                        <div class="form-check h-100 border rounded-3">
-                            <div class="p-3">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault2" />
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    UNI RUSB <br />
-                                    <small class="text-muted">5-7 dias para la entrega </small>
-                                </label>
+                        <div class="col-md-6 mb-3">
+                            <!-- Default radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        UNI RUSB <br />
+                                        <small class="text-muted">5-7 dias para la entrega </small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <!-- Default radio -->
-                        <div class="form-check h-100 border rounded-3">
-                            <div class="p-3">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault2" />
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    MASAYA <br />
-                                    <small class="text-muted">5-7 dias para la entrega </small>
-                                </label>
+                        <div class="col-md-6 mb-3">
+                            <!-- Default radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" value="Masaya" />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        MASAYA <br />
+                                        <small class="text-muted">5-7 dias para la entrega </small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <!-- Default radio -->
-                        <div class="form-check h-100 border rounded-3">
-                            <div class="p-3">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault2" />
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Metrocentro <br />
-                                    <small class="text-muted">5-7 dias para la entrega </small>
-                                </label>
+                        <div class="col-md-6 mb-3">
+                            <!-- Default radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" value="Metrocentro" />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Metrocentro <br />
+                                        <small class="text-muted">5-7 dias para la entrega </small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <!-- Default radio -->
+                            <div class="form-check h-100 border rounded-3">
+                                <div class="p-3">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" value="UNI RUSB" />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        UNI RUSB<br />
+                                        <small class="text-muted">5-7 dias para la entrega </small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row" id="mostrar" style="display: none;">
-                <div class="col-md-12 mb-3 ">
-                    <p class="mb-0">Direccion</p>
-                    <div class="form-outline">
-                        <textarea name="direccion" id="direccion" cols="30" rows="5" class="form-control"></textarea>
+                <div class="row" id="mostrar" style="display: none;">
+                    <div class="col-md-12 mb-3 ">
+                        <p class="mb-0">Direccion</p>
+                        <div class="form-outline">
+                            <textarea name="direccion" id="direccion" cols="30" rows="5" class="form-control"
+                                required></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </section>
+    <script>
+        const mostrarDiv = document.getElementById("mostrar");
+        const direccionInput = document.getElementById("direccion");
+
+        // Función para actualizar el atributo "required" del campo de dirección
+        function actualizarRequired() {
+            if (mostrarDiv.style.display === "none") {
+                direccionInput.removeAttribute("required");
+            } else {
+                direccionInput.setAttribute("required", "");
+            }
+        }
+
+        // Llamada inicial para configurar el atributo "required" según el estado actual del div
+        actualizarRequired();
+
+        // Escuchar cambios en el estilo "display" del div y actualizar "required" en consecuencia
+        mostrarDiv.addEventListener("change", actualizarRequired);
+    </script>
+
     <script>
         const estadoSelect = document.getElementById('estado');
         const contenidoConfirmar = document.getElementById('seleccionar');

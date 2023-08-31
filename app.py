@@ -21,9 +21,16 @@ from sqlalchemy.orm import outerjoin
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import exists, not_
 from twilio.rest import Client
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+import requests
+tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api         
+import cloudinary.api        
 cloudinary.config( 
   cloud_name = "dxhb03y8f", 
   api_key = "372496255286474", 
@@ -53,7 +60,10 @@ db.init_app(app)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db_session = scoped_session(sessionmaker(bind=engine))
-
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
 # Inicio
 @app.route("/")
 def index():
@@ -1606,9 +1616,7 @@ def actualizar_cliente(id):
                 except cloudinary.exceptions.Error as upload_error:
                     flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
 
-        # Resto de tu código...
-
-      
+       
                     return redirect('/clientes')  
 
                     
@@ -1807,18 +1815,21 @@ def confirmar(id):
         return render_template("confirmar.html", confirmar=confirmar)
     if request.method == "POST":
         id_personalizacion = request.form.get('id')
-        tipo_entrega=request.form.get('tipo_entrega')
+        tipo_entrega=request.form.get('flexRadioDefault')
         estado = int(request.form.get('estado'))
+        direccion=request.form.get('direccion')
+        lugar = str(tipo_entrega) + " " + str(direccion)
+        print(tipo_entrega)
         personalizacion = Personalizacion.query.get(id_personalizacion)
-        detalle=DetallePersonalizacion.query.get(id_personalizacion)
+        detalle = DetallePersonalizacion.query.filter(DetallePersonalizacion.id_personalizacion == id_personalizacion).first()
+        print(detalle)
         if personalizacion is not None:
-            # Realiza las acciones necesarias con la personalización
-            # según si se acepta o se rechaza
+          
             if  estado == 3:
                 # Acciones cuando se acepta
                 personalizacion.estado = 3
                 db.session.add(personalizacion)
-                detalle.tipo_entrega=tipo_entrega
+                detalle.tipo_entrega=lugar
                 db.session.add(detalle)
                 db.session.commit()
                 flash('La confirmación se ha realizado correctamente.', 'success')
@@ -2102,76 +2113,94 @@ def actualizar_preguntas(id):
     db.session.add(preguntas)
     db.session.commit()
     flash("Se ha actualizado correctamente la pregunta","success")
-    imprimir()
     return redirect("/preguntas")
 
+def sort_by_tag(intent):
+    return intent['tag']
 
 @app.route("/api", methods=["GET"])
 def api():
-    # Realizar la consulta usando el ORM
     consulta = (
         db.session.query(CatPregunta.categoria.label('tag'), Pregunta.pregunta, Pregunta.respuesta)
         .join(Pregunta, CatPregunta.id == Pregunta.id_cat)
-        .order_by(CatPregunta.categoria)  # Ordenar por categoría
+        .order_by(CatPregunta.categoria)  
         .all()
     )
 
-    # Estructura para almacenar los intents
-    intents = {}
+    intents_list = []
 
-    # Iterar sobre los resultados
     for resultado in consulta:
         tag = resultado.tag
         pregunta = resultado.pregunta
         respuesta = resultado.respuesta
 
-        # Agregar tag si no existe
-        if tag not in intents:
-            intents[tag] = {
+        intent_exist = next((intent for intent in intents_list if intent['tag'] == tag), None)
+        
+        if intent_exist:
+            intent_exist['patterns'].append(pregunta)
+            intent_exist['responses'].append(respuesta)
+        else:
+            new_intent = {
                 'tag': tag,
-                'patterns': [],
-                'responses': []
+                'patterns': [pregunta],
+                'responses': [respuesta]
             }
+            intents_list.append(new_intent)
 
-        # Agregar pattern y response al tag
-        intents[tag]['patterns'].append(pregunta)
-        intents[tag]['responses'].append(respuesta)
+    intents_list = sorted(intents_list, key=sort_by_tag, reverse=True)
 
-    # Crear la lista de intents a partir del diccionario
-    intents_list = []
-
-    # Reorganizar la estructura de intents para tener el tag primero
-    for tag, data in intents.items():
-        intents_list.append(data)
-
-    # Crear la estructura final
     data = {
         'intents': intents_list
     }
-    intents_list = data['intents']
-
-# Iterar sobre los intents
-    for intent in intents_list:
-        tag = intent['tag']
-        patterns = intent['patterns']
-        responses = intent['responses']
-
-        print(f"Tag: {tag}")
-        print("Patterns:", patterns)
-        print("Responses:", responses)
-        print("------------------------")
 
     return jsonify(data)
 
-def imprimir():
-# Convertir el diccionario en una respuesta JSON
-    import json
 
-    # Supongamos que la función api() devuelve el JSON generado
-    json_data = api()
 
-    # Convierte la estructura JSON en una cadena formateada
-    json_str = json.dumps(json_data, indent=2)
 
-    # Imprime la cadena en la consola
-    return print(json_str)
+
+
+
+def calculate_similarity(user_input, patterns):
+    vectorizer = TfidfVectorizer()
+    pattern_vectors = vectorizer.fit_transform(patterns)
+    user_input_vector = vectorizer.transform([user_input])
+    similarities = cosine_similarity(user_input_vector, pattern_vectors)
+    max_similarity_index = similarities.argmax()
+    max_similarity = similarities[0, max_similarity_index]
+    return max_similarity, max_similarity_index
+
+def get_Chat_response(text):
+    user_input = text.lower()
+
+    api_url = "http://localhost:5000/api"
+    response = requests.get(api_url)
+    data = response.json()
+
+    intents = data.get("intents", [])
+    max_similarity = 0.0
+    selected_response = "No entiendo tu pregunta."
+
+    for intent in intents:
+        patterns = intent.get("patterns", [])
+        responses = intent.get("responses", [])
+        similarity, index = calculate_similarity(user_input, patterns)
+        if similarity > max_similarity:
+            max_similarity = similarity
+            selected_response = responses[index]
+
+    if max_similarity > 0.75:  # Umbral de similitud personalizado
+        return selected_response
+    else:
+        return "No comprendo tu pregunta, aun estoy en entrenamiento."
+    
+@app.route("/asistente",methods=["GET", "POST"])
+def asistente():
+    return render_template('asistente.html') 
+
+@app.route("/get", methods=["GET", "POST"])
+def chat():
+    msg = request.form["msg"]
+    input = msg
+    print(get_Chat_response(input))
+    return get_Chat_response(input)

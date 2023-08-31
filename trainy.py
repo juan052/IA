@@ -112,10 +112,10 @@ for epoch in range(num_epochs):
         optimizer.step()
         
     if (epoch+1) % 100 == 0:
-        print (f'Epoca [{epoch+1}/{num_epochs}], perdida: {loss.item():.4f}')
+        print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 
 
-print(f'final de la perdida: {loss.item():.4f}')
+print(f'final loss: {loss.item():.4f}')
 
 data = {
 "model_state": model.state_dict(),
@@ -129,4 +129,4 @@ data = {
 FILE = "data.pth"
 torch.save(data, FILE)
 
-print(f'Entrenamiento completo. se ha guardado el documento {FILE}')
+print(f'training complete. file saved to {FILE}')

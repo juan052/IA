@@ -2,19 +2,15 @@ import random
 import json
 
 import torch
-
+import requests
 from model import NeuralNet
 from nltk_utils import bag_of_words, tokenize
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-import requests  # Agrega esta importación
-
 # Obtener los intents desde tu API
 api_url = "http://127.0.0.1:5000/api"
 response = requests.get(api_url)
 intents = response.json()
-
 
 FILE = "data.pth"
 data = torch.load(FILE)
@@ -30,7 +26,7 @@ model = NeuralNet(input_size, hidden_size, output_size).to(device)
 model.load_state_dict(model_state)
 model.eval()
 
-bot_name = "Luxx"
+bot_name = "Sam"
 
 def get_response(msg):
     sentence = tokenize(msg)
@@ -50,7 +46,7 @@ def get_response(msg):
             if tag == intent["tag"]:
                 return random.choice(intent['responses'])
     
-    return "Lo siento aun estoy en entrenamiento"
+    return "I do not understand..."
 
 
 if __name__ == "__main__":
@@ -63,4 +59,3 @@ if __name__ == "__main__":
 
         resp = get_response(sentence)
         print(resp)
-
