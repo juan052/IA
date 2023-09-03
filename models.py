@@ -344,14 +344,16 @@ class VentaPersonalizacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_venta = db.Column(db.Integer, db.ForeignKey('venta.id'))
     id_personalizacion = db.Column(db.Integer, db.ForeignKey('personalizacion.id'))
+    descripcion=db.Column(db.String(255))
     cantidad=db.Column(db.Integer)
     subtotal = db.Column(db.Numeric, nullable=False)
     venta = relationship('Venta')
     personalizacion = relationship('Personalizacion')
 
-    def __init__(self, id_venta, id_personalizacion,cantidad, subtotal):
+    def __init__(self, id_venta, id_personalizacion,descripcion,cantidad, subtotal):
         self.id_venta = id_venta
         self.id_personalizacion = id_personalizacion
+        self.descripcion=descripcion
         self.cantidad = cantidad
         self.subtotal = subtotal
 

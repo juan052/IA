@@ -1,6 +1,188 @@
 {% extends "index_base.html" %}
 {% block title %} || Pedidos{% endblock %}
 {% block main %}
+<section style="padding-top: 8rem;">
+    <div class="bg-holder">
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group">
+                    <p>Pedidos personalizado</p>
+                    {% for detalle in confirmar%}
+                    <li class="list-group-item">
+                        Descripcion de pedido: <br>
+                        {{detalle.personalizacion.descripcion}}
+                        <br>
+                        <a href="/confirmar/{{detalle.id_personalizacion}}" class="btn btn-success">Enviar respuesta</a>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            New</span>
+                    </li>
 
+                    {%endfor%}
+                </ul>
+            </div>
+            <div class="col-md-8">
+                <h3>Lista pedidos por entregar</h3>
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Numero</th>
+                            <th>Codigo</th>
+                            <th>Tipo de pedido</th>
+                            <th>Fecha de entrega</th>
+                            <th>Lugar de entrega</th>
+                            <th>Estado</th>
+                            <th>Accion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for productos in ventas %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>{{ productos.codigo }}</td>
+                            <td>
+                                {% if productos.tipo_venta.id == 1 %}
+                                <p>Productos</p>
+                                {% else %}
+                                <p>Personalizacion</p>
+                                {% endif %}
 
+                            </td>
+                            <td>{{ productos.fecha_entrega }}</td>
+                            <td>{{ productos.tipo_entrega }}</td>
+
+                            <td>
+                                {% if productos.estado == 2 %}
+                                <span class="badge bg-success">En espera de entrega</span>
+
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if productos.tipo_venta.id == 1 %}
+                                <a href="#exampleModales{{productos.id}}" class="edit" data-bs-toggle="modal"> Ver
+                                    detalles
+                                    <i class="fas fa-eye"></i>
+                                    
+                                </a>
+                                {% else %}
+                                <a href="#exampleModale{{productos.id}}" class="edit" data-bs-toggle="modal"> Ver
+                                    detalles
+                                    <i class="fas fa-eye"></i>
+                                    
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% for productos in detalles %}
+<div class="modal fade" id="exampleModales{{productos.venta.id}}" tabindex="-1" aria-labelledby="exampleModalLabeles"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalles del pedido {{productos.venta.codigo}}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: black;">
+                    Lugar de entrega:
+                    <br>
+                    {{ productos.venta.tipo_entrega }}
+                    <br>
+                    Fecha de entrega:
+                    <br>
+                    {{ productos.venta.fecha_entrega }}
+                </p>
+                <hr>
+                <H6 style="color: black;">Productos</H6>
+                {% for prod in detalles %}
+                {% if prod.id_venta == productos.id_venta %}
+                <li style="color: black;">{{prod.producto.nombre}}</li>
+                <li><strong>Cantidad</strong> {{prod.cantidad}}</li>
+                {% endif %}
+                {% endfor %}
+                <hr>
+                <p>
+                <ul>
+                    {% set descuento = productos.venta.descuento %}
+                    {% set total = productos.venta.total %}
+                    {% set resultado =  total-descuento %}
+                  
+
+                    subTotal:  C$ {{ resultado }}
+
+                </ul>
+                <ul>Descuento:{{productos.venta.descuento}}</ul>
+                <ul>Total: C$ {{productos.venta.total}}</ul>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+{% for productos in personalizacion %}
+<div class="modal fade" id="exampleModale{{productos.venta.id}}" tabindex="-1" aria-labelledby="exampleModalLabeles"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalles del pedido {{productos.venta.codigo}}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: black;">
+                    Lugar de entrega:
+                    <br>
+                    {{ productos.venta.tipo_entrega }}
+                    <br>
+                    Fecha de entrega:
+                    <br>
+                    {{ productos.venta.fecha_entrega }}
+                </p>
+                <hr>
+                <h6>Pedido</h6>
+                <img src="{{ productos.personalizacion.fotos }}" alt="avatar" class="rounded-circle img-fluid"
+                style="width: 50px;">
+                <br>
+                <H6 style="color: black;">Descripcion:</H6>
+                {{productos.descripcion}}
+                <hr>
+              
+                <ul>
+                    {% set descuento = productos.venta.descuento %}
+                    {% set total = productos.venta.total %}
+                    {% set resultado =  total-descuento %}
+                  
+
+                    subTotal:  C$ {{ resultado }}
+
+                </ul>
+                <ul>Descuento:{{productos.venta.descuento}}</ul>
+                <ul>Total: C$ {{productos.venta.total}}</ul>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endfor %}
 {% endblock %}

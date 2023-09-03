@@ -121,17 +121,7 @@
 	</div><!-- end of .container-->
 
 </section>
-{% if cantidad > 0 %}
-<section class="product">
-	<div class="middle-text">
-		<h2>Confirma tu pedidos.</h2>
-		{% for detalle in confirmar%}
-		<a href="/confirmar/{{detalle.id_personalizacion}}" class="btn">Respuesta</a>
 
-		{%endfor%}
-	</div>
-</section>
-{% endif %}
 <section class="pt-5" id="destination">
 	<div class="container">
 		<div class="position-absolute start-100 bottom-0 translate-middle-x d-none d-xl-block ms-xl-n4"><img

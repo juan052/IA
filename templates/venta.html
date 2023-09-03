@@ -176,9 +176,6 @@
                                                         {{pedidos.costo_total}}
                                                     </p>
                                                     <div class="btn-group">
-
-
-
                                                         <a class="btn btn-success" href="#modal-dangers{{pedidos.id}}"
                                                             data-toggle="modal">Crear venta</a>
                                                     </div>
@@ -186,8 +183,9 @@
 
                                             </div>
                                         </div>
+                                        {%endfor%}
                                     </div>
-                                    {%endfor%}
+
                                 </div>
 
                             </div>
@@ -258,7 +256,7 @@
         </div>
     </div>
 
-    </div>
+
 
     {% for categoria in pedido %}
     <div class="modal fade" id="modal-imagen{{categoria.id}}">
@@ -340,7 +338,7 @@
     {%for categoria in confirmar%}
     <div class="modal fade" id="modal-dangers{{categoria.id}}">
         <div class="modal-dialog">
-            <div class="modal-content bg-blue">
+            <div class="modal-content">
                 <form action="/crear_venta_pedido" method="post">
                     <div class="modal-header">
                         <h4 class="modal-title">Crea venta por pedido</h4>
@@ -353,7 +351,17 @@
                         <input type="text" name="id_cliente" value="{{categoria.personalizacion.id_cliente}}" hidden>
                         <input type="text" name="id" value="{{categoria.personalizacion.id}}" hidden>
                         <input type="text" name="costo_total" value="{{categoria.costo_total}}" hidden>
-                        <input type="number" name="descuento" class="form-control">
+                        <div class="form-group">
+                            <label for="">Descuento</label>
+                            <input type="number" name="descuento" class="form-control">
+                        </div>
+                        <input type="text" name="entrega" value="{{categoria.tipo_entrega}}" hidden>
+                        <input type="date" name="fecha" value="{{categoria.fecha_entrega}}" hidden>
+                        <div class="form-group">
+                            <label for="">Descripcion para el pedido</label>
+                            <textarea name="descripcion" id="" cols="30" rows="10" class="form-control"></textarea>
+
+                        </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancelar</button>
@@ -366,7 +374,7 @@
         <!-- /.modal-dialog -->
     </div>
     {%endfor%}
-    
+
     {% for categoria in ventas_con_productos %}
     {% set venta = categoria['venta'] %}
     <div class="modal fade" id="modal-dangerss{{ venta.id }}">
@@ -387,7 +395,7 @@
                             <input type="number" name="descuento" id="descuento" min="0" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label>Descuento hacia el pedido</label>
+                            <label>Fecha de entrega</label>
                             <input type="date" name="fecha_entrega" id="fecha" min="" class="form-control" required>
                         </div>
                     </div>

@@ -3,11 +3,11 @@
 
 {% block main %}
 <section style="padding-top: 7rem;">
-    <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
+    <div class="bg-holder">
     </div>
     <section class="container">
         <form action="/confirmar/{{confirmar.personalizacion.id}}" method="post">
-            <input type="text" value="{{confirmar.personalizacion.id}}" name="id">
+            <input type="text" value="{{confirmar.personalizacion.id}}" name="id" hidden>
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Confirmacion de pedido</h3>

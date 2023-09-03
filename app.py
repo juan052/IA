@@ -6,19 +6,15 @@ from user_agents import parse
 from decimal import Decimal
 import string
 from flask import Flask, send_file, session, redirect, url_for, render_template, request, flash,jsonify
-from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_session import Session
 from sqlalchemy import create_engine, text, not_,and_, func
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import *
 from flask_sqlalchemy import SQLAlchemy
 from models import *
 from helper import *
 from helper1 import *
-from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import outerjoin
-from sqlalchemy.orm import aliased
 from sqlalchemy.sql import exists, not_
 from twilio.rest import Client
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -93,10 +89,12 @@ def logout(id):
     db.session.commit()
 
 
-      # Borrar toda la sesión
-    session.clear()
+    # Borrar toda la sesión
+    if id == session['id_conexion']:
+        session.clear()
 
     # Redireccionar al inicio de sesión
+    flash("Se ha cerrado la sesion correctamente","success")
     return redirect(url_for('home'))
 
 @app.route("/acerca")
@@ -129,7 +127,7 @@ def shop():
     Precios = Precio.query.join(Precio.producto).filter(Producto.cantidad > 0).options(joinedload(Precio.producto)).all()
     cliente_id = session.get('cliente_id')
     cantidad = Personalizacion.query.filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).count()
-    confirmar = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).all()
+  
     
     return render_template('shop.html', Precios=Precios, usuario=usuario, cantidad=cantidad, confirmar=confirmar)
     
@@ -154,7 +152,8 @@ def perfil(id):
     
     persona_obj, persona_natural, persona_juridica = persona
     
-    return render_template("perfil.html", cliente=cliente, persona=persona_obj, persona_natural=persona_natural, persona_juridica=persona_juridica)
+    conexion=Conexion.query.filter(Conexion.id_usuario==session['cliente_usuario'], Conexion.estado==1)
+    return render_template("perfil.html", cliente=cliente, persona=persona_obj, persona_natural=persona_natural, persona_juridica=persona_juridica,conexion=conexion)
 
 @app.route('/actualizar_clientes/<int:id>', methods=["GET", "POST"])
 @login_requirede
@@ -254,17 +253,11 @@ def cambiar_contraseñas():
 def pedido(id):
     cliente=Cliente.query.get(id)
     id=cliente.id
-    pedidos = (
-    DetallePersonalizacion.query
-    .options(joinedload(DetallePersonalizacion.personalizacion))
-    .filter(DetallePersonalizacion.personalizacion.has(id_cliente=id))
-    .all())
-    ventas=(DetalleVenta.query
-            .options(joinedload(DetalleVenta.venta))
-            .filter(DetalleVenta.venta.has(id_cliente=id))
-            .all())
-    print(ventas)
-    return render_template("pedidos.html")
+    confirmar = DetallePersonalizacion.query.join(DetallePersonalizacion.personalizacion).filter(Personalizacion.estado == 2, Personalizacion.id_cliente == id).all()
+    ventas=Venta.query.filter(Venta.id_cliente == id, Venta.estado ==2).all()
+    detalles = DetalleVenta.query.join(DetalleVenta.venta).filter(Venta.estado==2, Venta.id_cliente==id).all()
+    personalizacion=VentaPersonalizacion.query.join(VentaPersonalizacion.venta).filter(Venta.estado==2, Venta.id_cliente==id).all()
+    return render_template("pedidos.html" ,confirmar=confirmar,ventas=ventas,detalles=detalles,personalizacion=personalizacion)
 
 #Gestion de productos
 @app.route("/categoria")
@@ -1915,8 +1908,11 @@ def crear_venta_pedido():
     if request.method == "POST":
         id=request.form.get('id')
         id_cliente= request.form.get('id_cliente')
+        entrega=request.form.get('entrega')
         costo_total=request.form.get('costo_total')
+        fecha_entrega=request.form.get('fecha')
         descuento=request.form.get('descuento')
+        descripcion=request.form.get('descripcion')
         if descuento == '':
             descuento=0
         ultima_venta = Venta.query.order_by(Venta.id.desc()).first()
@@ -1934,12 +1930,12 @@ def crear_venta_pedido():
             id_venta = 1
 
         codigo = "V-00" + str(id_venta) 
-        venta= Venta(id_cliente=id_cliente,id_tipo=2,fecha=fecha,codigo=codigo,tipo_entrega="metro",estado=2)
+        venta= Venta(id_cliente=id_cliente,id_tipo=2,codigo=codigo,tipo_entrega=entrega,fecha=fecha,fecha_entrega=fecha_entrega,descuento=descuento,total=total,estado=2)
         db.session.add(venta)
         db.session.commit()
         ultimo_id = venta.id
 
-        detalle_venta=VentaPersonalizacion(id_venta=ultimo_id,id_personalizacion=id,subtotal=costo_total,descuento=descuento,total=total)
+        detalle_venta=VentaPersonalizacion(id_venta=ultimo_id,id_personalizacion=id,descripcion=descripcion,subtotal=costo_total,cantidad=1)
         db.session.add(detalle_venta)
         db.session.commit()
         flash("Se ha realizado la venta","success")
@@ -2099,7 +2095,7 @@ def crear_preguntas():
     flash("Se ha registrado con exito la pregunta","success")
     return redirect("/preguntas")
 
-@app.route("/actualizar_preguntas//<int:id>",methods=["GET","POST"])
+@app.route("/actualizar_preguntas/<int:id>",methods=["GET","POST"])
 @login_required
 def actualizar_preguntas(id):
     categoria=request.form.get("categoria")

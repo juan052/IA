@@ -249,3 +249,15 @@ CREATE TABLE permiso_usuario(
     id_permiso_modulo INTEGER REFERENCES permiso_modulo(id),
     id_usuario INTEGER REFERENCES usuario(id)
 );
+
+CREATE TABLE catpregunta(
+id serial primary key,
+categoria VARCHAR(250)
+);
+
+CREATE TABLE pregunta(
+    id serial primary key,
+    id_cat INTEGER REFERENCES catpregunta(id),
+    pregunta VARCHAR(250) NOT NULL,
+    respuesta TEXT NOT NULL
+  );
