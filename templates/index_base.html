@@ -20,7 +20,40 @@
     <meta name="msapplication-TileImage" content="static/img/5.png>
 	<meta name=" theme-color" content="#ffffff">
 
+    <style>
+        .shopping-cart {
+            position: fixed;
+            bottom: 80px;
+            right: 10px;
+            height: 60px;
+            width: 60px;
+            display: flex;
+            place-items: center;
+            justify-content: center;
+            border-radius: 70%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
 
+        .shopping-cart.active {
+            width: 8rem;
+            border-radius: .8rem;
+        }
+
+        .shopping-cart.active>span {
+            margin-left: -4rem;
+        }
+
+        .arrow:hover,
+        .shopping-cart:hover {
+            outline: .5rem solid #fff5;
+        }
+
+        .cart-icon {
+            font-size: 2rem;
+            transition: .5s ease-in-out;
+        }
+    </style>
     <!-- ===============================================-->
     <!--    Stylesheets-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
@@ -142,9 +175,57 @@
         {% block main %}
         <!-- Contenido específico de la página -->
         {% endblock %}
-        
-          
-       
+        <div class="shopping-cart" data-bs-toggle="modal" data-bs-target="#welcome-modal">
+            <span><img src="https://res.cloudinary.com/dxhb03y8f/image/upload/v1693780765/rrlh0xxo8ws9ts3jagd7.png"
+                    alt="" width="25px" height="45px"></span>
+        </div>
+        <div class="modal fade" id="welcome-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+ <div class="d-flex bd-highlight">
+                            <div class="img_cont">
+                                <img src="https://res.cloudinary.com/dxhb03y8f/image/upload/v1691826766/5_zineop.png"
+                                    class="rounded-circle user_img">
+                                <span class="online_icon"></span>
+                            </div>
+                            <div class="user_info">
+                                <span>Luxx</span>
+                                <p>Estoy para responder tu preguntas!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="messageFormeight" class="card-body msg_card_body">
+
+
+                    </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form id="messageArea" class="input-group">
+                            <div class="col-sm-9" style="margin: 8px;">
+                                <div class="input-group-icon">
+                                    <input class="form-control form-little-squirrel-control" type="text" id="text"
+                                        name="msg" placeholder="Mensaje" aria-label="email" required />
+                                    <img class="input-box-icon" src="static/assets/img/cta/mail.svg" width="17"
+                                        alt="mail" />
+                                </div>
+                            </div>
+                            <div class="col-sm-auto">
+                                <button type="submit" class="btn btn-danger orange-gradient-btn fs--1"
+                                    id="">Enviar</button>
+                                <button class="btn btn-danger orange-gradient-btn fs--1" id="mic-button">🎙</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <section class="pb-0 pb-lg-4">
 
@@ -180,7 +261,8 @@
                     <div class="col-lg-2 col-md-4 mb-4 mb-lg-0 order-lg-3 order-md-4">
                         <h4 class="footer-heading-color fw-bold font-sans-serif mb-3 mb-lg-4">Mas</h4>
                         <ul class="list-unstyled mb-0">
-                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none" href="/asistente">Asistete
+                            <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
+                                    href="/asistente">Asistete
                                     virtual</a></li>
                             <li class="mb-2"><a class="link-900 fs-1 fw-medium text-decoration-none"
                                     href="#!">Recomendaciones</a></li>
@@ -188,12 +270,14 @@
                         </ul>
                     </div>
                     <div class="col-lg-3 col-md-5 col-12 mb-4 mb-md-6 mb-lg-0 order-lg-4 order-md-1">
-                        <div class="icon-group mb-4"> <a class="text-decoration-none icon-item shadow-social"
-                                id="facebook" href="#!"><i class="fab fa-facebook-f"> </i></a><a
-                                class="text-decoration-none icon-item shadow-social" id="instagram" href="#!"><i
-                                    class="fab fa-instagram"> </i></a><a
-                                class="text-decoration-none icon-item shadow-social" id="twitter" href="#!"><i
-                                    class="fab fa-twitter"> </i></a></div>
+                        <div class="icon-group mb-4">
+                            <a class="text-decoration-none icon-item shadow-social" id="facebook" href="#!"><i
+                                    class="fab fa-facebook-f"> </i></a>
+                            <a class="text-decoration-none icon-item shadow-social" id="instagram" href="#!"><i
+                                    class="fab fa-instagram"> </i></a>
+                            <a class="text-decoration-none icon-item shadow-social" id="twitter" href="#!"><i
+                                    class="fab fa-twitter"> </i></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,21 +285,8 @@
         <div class="py-5 text-center">
             <p class="mb-0 text-secondary fs--1 fw-medium">Todos los derechos reservados</p>
         </div>
-        <!-- <section> close ============================-->
-        <!-- ============================================-->
-
-
     </main>
-    <!-- ===============================================-->
-    <!--    End of Main Content-->
-    <!-- ===============================================-->
 
-
-
-
-    <!-- ===============================================-->
-    <!--    JavaScripts-->
-    <!-- ===============================================-->
     <script src="{{ url_for('static', filename='vendors/@popperjs/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/bootstrap/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendors/is/is.min.js') }}"></script>
@@ -229,6 +300,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Volkhov:wght@700&amp;display=swap"
         rel="stylesheet">
+   
 </body>
 
 </html>

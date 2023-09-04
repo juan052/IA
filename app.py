@@ -2151,12 +2151,6 @@ def api():
 
     return jsonify(data)
 
-
-
-
-
-
-
 def calculate_similarity(user_input, patterns):
     vectorizer = TfidfVectorizer()
     pattern_vectors = vectorizer.fit_transform(patterns)
