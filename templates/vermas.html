@@ -1,0 +1,100 @@
+{% extends "index_base.html" %}
+{% block title %} || Detalles{% endblock %}
+{% block main %}
+<section style="padding-top: 7rem;">
+    <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
+    </div>
+    <!--/.bg-holder-->
+    <article class="container-fluid">
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card card-solid">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <h3 class="d-inline-block d-sm-none">{{producto.producto.nombre}}</h3>
+                            <div class="col-12">
+                                <img src="{{producto.producto.logo}}" class="product-image" alt="Product Image">
+                            </div>
+                            <div class="col-12 product-image-thumbs">
+                                <div class="product-image-thumb active"><img src="{{producto.producto.logo}}"
+                                        alt="Product Image"></div>
+                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
+                                        alt="Product Image"></div>
+                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
+                                        alt="Product Image"></div>
+                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
+                                        alt="Product Image"></div>
+                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
+                                        alt="Product Image"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <h3 class="my-3">{{producto.producto.nombre}}</h3>
+                            <p>{{producto.producto.descripcion}}.</p>
+                            <hr>
+                            <div class="bg-gray py-2 px-3 mt-4">
+                                <h2 class="mb-0">
+                                    Precio Unitario {{producto.precio_actual}}
+                                </h2>
+
+                            </div>
+
+                            <div class="mt-4">
+                                <form action="/agregar" method="post">
+                                    <input type="text" value="{{ producto.producto.id }}"
+                                        name="producto_id_{{ producto.producto.id }}" hidden>
+                                    <input type="text" name="cantidad_{{ producto.id }}" value="1" hidden>
+
+                                    <button type="submit" class="btn btn-primary btn-lg btn-flat">
+
+                                        Agregar al <i class="fas fa-cart-plus fa-lg mr-2"></i>
+                                    </button>
+                                </form>
+                              
+                            </div>
+
+                            <div class="mt-4 icon-group mb-4">
+                                <a class="text-decoration-none icon-item shadow-social" id="facebook" href="#!"><i
+                                        class="fab fa-facebook-f"> </i></a>
+                                <a class="text-decoration-none icon-item shadow-social" id="instagram" href="#!"><i
+                                        class="fab fa-instagram"> </i></a>
+                                <a class="text-decoration-none icon-item shadow-social" id="twitter" href="#!"><i
+                                        class="fab fa-twitter"> </i></a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                                    aria-selected="true">Home</button>
+                                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
+                                    aria-selected="false">Profile</button>
+                                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact"
+                                    aria-selected="false">Contact</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
+                                aria-labelledby="nav-home-tab">Hola</div>
+                            <div class="tab-pane fade" id="nav-profile" role="tabpanel"
+                                aria-labelledby="nav-profile-tab">Mundo</div>
+                            <div class="tab-pane fade" id="nav-contact" role="tabpanel"
+                                aria-labelledby="nav-contact-tab">Hola</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+        </section>
+    </article>
+</section>
+{% endblock %}

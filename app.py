@@ -14,16 +14,16 @@ from sqlalchemy.orm import *
 from flask_sqlalchemy import SQLAlchemy
 from models import *
 from helper import *
-from helper1 import *
 from sqlalchemy.sql import exists, not_
 from twilio.rest import Client
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import requests
-tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api        
@@ -56,6 +56,10 @@ db.init_app(app)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db_session = scoped_session(sessionmaker(bind=engine))
+
+
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
@@ -130,7 +134,15 @@ def shop():
   
     
     return render_template('shop.html', Precios=Precios, usuario=usuario, cantidad=cantidad, confirmar=confirmar)
+
+@app.route("/vermas/<int:id>" ,methods=["POST","GET"])
+def ver_mas(id):
+    producto=Precio.query.get(id)
+    subcategorias=producto.producto.id_sub_categoria
     
+    recomendaciones=Producto.query.filter(Producto.id_sub_categoria==subcategorias).all()
+    return render_template("vermas.html",producto=producto,recomendaciones=recomendaciones)
+
 @app.route("/perfil/<int:id>", methods=["POST","GET"])
 @login_requirede
 def perfil(id):
@@ -2186,6 +2198,8 @@ def get_Chat_response(text):
     
 @app.route("/asistente",methods=["GET", "POST"])
 def asistente():
+  
+   # print(recommend(5,10))
     return render_template('asistente.html') 
 
 @app.route("/get", methods=["GET", "POST"])
@@ -2194,3 +2208,8 @@ def chat():
     input = msg
     print(get_Chat_response(input))
     return get_Chat_response(input)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
