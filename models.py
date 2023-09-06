@@ -39,7 +39,7 @@ class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_sub_categoria = db.Column(db.Integer, db.ForeignKey('sub_categoria_producto.id'))
     nombre = db.Column(db.String(120), nullable=False)
-    descripcion = db.Column(db.String(250), nullable=False)
+    descripcion = db.Column(db.Text(15000), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
     logo=db.Column(db.String(250), nullable=False)
     estado = db.Column(db.Integer)

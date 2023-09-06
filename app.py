@@ -460,7 +460,7 @@ def producto_actualizar(producto_id):
     producto = Producto.query.get_or_404(producto_id)
 
     if request.method == "POST":
-        id_sub_categoria = request.form.get('subcategoria')
+        id_sub_categoria = request.form.get('subcategorias')
         nombre = request.form.get('nombre')
         descripcion = request.form.get('descripcion')
         cantidad = request.form.get('cantidad')
@@ -486,19 +486,21 @@ def producto_actualizar(producto_id):
                 except cloudinary.exceptions.Error as upload_error:
                     flash("Error al actualizar la imagen: {}".format(str(upload_error)), "error")
                     return redirect(url_for('producto'))
-
+        print(descripcion)
         producto.id_sub_categoria = id_sub_categoria
         producto.nombre = nombre
         producto.descripcion = descripcion
         producto.cantidad = cantidad
         producto.logo = secure_url if 'secure_url' in locals() else logo
         producto.estado = estado
-
+        db.session.add(producto)
+        print("productos")
         try:
             db.session.commit()
             flash("Se ha actualizado el producto", "success")
         except Exception as db_error:
             db.session.rollback()
+            print("No se puede actualizar el producto")
             flash("Error al actualizar el producto: {}".format(str(db_error)), "error")
         
     return redirect(url_for('producto'))

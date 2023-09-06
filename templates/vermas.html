@@ -1,8 +1,9 @@
 {% extends "index_base.html" %}
 {% block title %} || Detalles{% endblock %}
+
 {% block main %}
 <section style="padding-top: 7rem;">
-    <div class="bg-holder" style="background-image:url(static/assets/img/hero/hero-bg.svg);">
+    <div class="bg-holder">
     </div>
     <!--/.bg-holder-->
     <article class="container-fluid">
@@ -13,22 +14,9 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <h3 class="d-inline-block d-sm-none">{{producto.producto.nombre}}</h3>
-                            <div class="col-12">
-                                <img src="{{producto.producto.logo}}" class="product-image" alt="Product Image">
-                            </div>
-                            <div class="col-12 product-image-thumbs">
-                                <div class="product-image-thumb active"><img src="{{producto.producto.logo}}"
-                                        alt="Product Image"></div>
-                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
-                                        alt="Product Image"></div>
-                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
-                                        alt="Product Image"></div>
-                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
-                                        alt="Product Image"></div>
-                                <div class="product-image-thumb"><img src="{{producto.producto.logo}}"
-                                        alt="Product Image"></div>
-                            </div>
+
+                            <img src="{{producto.producto.logo}}" class="img-fluid" alt="Product Image">
+
                         </div>
                         <div class="col-12 col-sm-6">
                             <h3 class="my-3">{{producto.producto.nombre}}</h3>
@@ -52,7 +40,7 @@
                                         Agregar al <i class="fas fa-cart-plus fa-lg mr-2"></i>
                                     </button>
                                 </form>
-                              
+
                             </div>
 
                             <div class="mt-4 icon-group mb-4">
@@ -97,4 +85,15 @@
         </section>
     </article>
 </section>
+
+<script>
+    $(document).ready(function () {
+        $('.product-image-thumb').on('click', function () {
+            var $image_element = $(this).find('img')
+            $('.product-image').prop('src', $image_element.attr('src'))
+            $('.product-image-thumb.active').removeClass('active')
+            $(this).addClass('active')
+        })
+    })
+</script>
 {% endblock %}
