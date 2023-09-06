@@ -9,8 +9,9 @@ from flask import Flask, send_file, session, redirect, url_for, render_template,
 from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_session import Session
-from sqlalchemy import create_engine, text, not_,and_, func
+from sqlalchemy import create_engine, text, not_,and_, func,select  
 from sqlalchemy.orm import *
+from sqlalchemy.orm import joinedload
 from flask_sqlalchemy import SQLAlchemy
 from models import *
 from helper import *
@@ -19,6 +20,7 @@ from twilio.rest import Client
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import requests
+from collections import defaultdict
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
@@ -124,16 +126,48 @@ def contacto():
         # La sesión existe
         
         return render_template('contacto.html', usuario=usuario)
+def get_productos_mas_vendidos():
+    conteo_productos = db.session.query(
+    DetalleVenta.id_producto,
+    func.count().label('repeticiones')
+).group_by(DetalleVenta.id_producto).order_by(func.count().desc()).all()
 
+# Obtener los productos más repetidos
+    productos_mas_repetidos = []
+    for id_producto, repeticiones in conteo_productos:
+        producto = Producto.query.get(id_producto)
+        if producto:
+            productos_mas_repetidos.append((producto, repeticiones))
+
+# Ordenar la lista de productos más repetidos por repeticiones en orden descendente
+    
+    return productos_mas_repetidos.sort(key=lambda x: x[1], reverse=True)
 @app.route("/shop")
 def shop():
     usuario = session.get('cliente_id')
-    Precios = Precio.query.join(Precio.producto).filter(Producto.cantidad > 0).options(joinedload(Precio.producto)).all()
-    cliente_id = session.get('cliente_id')
-    cantidad = Personalizacion.query.filter(Personalizacion.estado == 2, Personalizacion.id_cliente == cliente_id).count()
-  
-    
-    return render_template('shop.html', Precios=Precios, usuario=usuario, cantidad=cantidad, confirmar=confirmar)
+    page = int(request.args.get('page', 1)) 
+    categorias=select_categorias()
+    # Filtros
+    categoria = request.args.get('categoria')
+    precio_min = request.args.get('precio_min')
+    precio_max = request.args.get('precio_max')
+    mas_vendidos = request.args.get('mas_vendidos') 
+    query = Precio.query.join(Precio.producto).filter(Producto.cantidad > 0, Producto.estado == 1)
+
+    if categoria:
+        query = query.filter(Producto.id_sub_categoria == categoria)
+    if precio_min:
+        query = query.filter(Precio.precio_actual >= precio_min)
+    if precio_max:
+        query = query.filter(Precio.precio_actual <= precio_max)
+    if mas_vendidos:
+        productos_mas_vendidos = get_productos_mas_vendidos()
+        query = query.filter(Producto.id.in_(productos_mas_vendidos.subquery()))
+        
+
+    Precios = query.options(joinedload(Precio.producto)).paginate(page=page, per_page=12)
+    return render_template('shop.html', Precios=Precios, usuario=usuario,categorias=categorias)
+
 
 @app.route("/vermas/<int:id>" ,methods=["POST","GET"])
 def ver_mas(id):
@@ -2133,31 +2167,48 @@ def api():
     consulta = (
         db.session.query(CatPregunta.categoria.label('tag'), Pregunta.pregunta, Pregunta.respuesta)
         .join(Pregunta, CatPregunta.id == Pregunta.id_cat)
-        .order_by(CatPregunta.categoria)  
+        .order_by(CatPregunta.categoria)
         .all()
     )
+    consulta_producto = (
+        db.session.query(
+            SubCategoriaProducto.nombre.label('tag'),
+            Producto.nombre.label('producto'),
+            Producto.descripcion.label('respuesta')
+        )
+        .join(Producto, SubCategoriaProducto.id == Producto.id_sub_categoria)
+        .order_by(SubCategoriaProducto.nombre)
+        .all()
+    )
+    
+    # Crear un diccionario defaultdict para agrupar resultados por etiqueta (tag)
+    intents_dict = defaultdict(lambda: {'tag': '', 'patterns': [], 'responses': []})
 
-    intents_list = []
-
+    # Procesar los resultados de la consulta original
     for resultado in consulta:
         tag = resultado.tag
         pregunta = resultado.pregunta
         respuesta = resultado.respuesta
 
-        intent_exist = next((intent for intent in intents_list if intent['tag'] == tag), None)
-        
-        if intent_exist:
-            intent_exist['patterns'].append(pregunta)
-            intent_exist['responses'].append(respuesta)
-        else:
-            new_intent = {
-                'tag': tag,
-                'patterns': [pregunta],
-                'responses': [respuesta]
-            }
-            intents_list.append(new_intent)
+        intents_dict[tag]['tag'] = tag
+        intents_dict[tag]['patterns'].append(pregunta)
+        intents_dict[tag]['responses'].append(respuesta)
 
-    intents_list = sorted(intents_list, key=sort_by_tag, reverse=True)
+    # Procesar los resultados de la consulta de productos
+    for resultado in consulta_producto:
+        tag = resultado.tag
+        producto = resultado.producto
+        respuesta = resultado.respuesta
+
+        intents_dict[tag]['tag'] = tag
+        intents_dict[tag]['patterns'].append(producto)
+        intents_dict[tag]['responses'].append(respuesta)
+
+    # Convertir el diccionario a una lista de intents
+    intents_list = list(intents_dict.values())
+
+    # Ordenar la lista de intents por la etiqueta (tag)
+    intents_list = sorted(intents_list, key=lambda x: x['tag'])
 
     data = {
         'intents': intents_list

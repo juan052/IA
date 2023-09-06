@@ -26,6 +26,7 @@ Activates the Python virtual environment that contains the Activate.ps1 script.
 Activate.ps1 -Verbose
 Activates the Python virtual environment that contains the Activate.ps1 script,
 and shows extra information about the activation as it executes.
+cls
 
 .Example
 Activate.ps1 -VenvDir C:\Users\MyUser\Common\.venv
