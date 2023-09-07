@@ -141,11 +141,12 @@ def shop():
     usuario = session.get('cliente_id')
     page = int(request.args.get('page', 1))
     categorias = select_categorias()
+    recomendaciones=obtener_productos_mas_vendidos()
+    print(recomendaciones)
     # Filtros
     categoria = request.args.get('categoria')
     precio_min = request.args.get('precio_min')
     precio_max = request.args.get('precio_max')
-    mas_vendidos = request.args.get('mas_vendidos')
     
     query = Precio.query.join(Precio.producto).filter(
         Producto.cantidad > 0, Producto.estado == 1)
@@ -156,34 +157,43 @@ def shop():
         query = query.filter(Precio.precio_actual >= precio_min)
     if precio_max:
         query = query.filter(Precio.precio_actual <= precio_max)
-    if mas_vendidos:
-        productos_mas_vendidos = get_productos_mas_vendidos()
-        # convierte la lista de productos más vendidos en una subconsulta
-        subquery = db.session.query(DetalleVenta.id_producto).filter(
-            DetalleVenta.id_producto.in_(productos_mas_vendidos)).subquery()
-        # filtra la consulta original por los productos más vendidos
-        query = query.filter(Precio.id_producto.in_(subquery))
 
     Precios = query.options(joinedload(Precio.producto)
                             ).paginate(page=page, per_page=12)
-    return render_template('shop.html', Precios=Precios, usuario=usuario, categorias=categorias)
+    return render_template('shop.html',recomendaciones=recomendaciones, Precios=Precios, usuario=usuario, categorias=categorias)
 
 
 def get_productos_mas_vendidos():
     productos_mas_vendidos = db.session.query(DetalleVenta.id_producto).group_by(
-        DetalleVenta.id_producto).order_by(func.sum(DetalleVenta.cantidad).desc()).all()
-    # devuelve solo una lista de los id de los productos más vendidos
+        DetalleVenta.id_producto).order_by(func.sum(DetalleVenta.cantidad).desc()).limit(6).all()
+    # Devuelve solo una lista de los IDs de los productos más vendidos
     return [producto[0] for producto in productos_mas_vendidos]
+def obtener_productos_mas_vendidos():
+    ids_productos_mas_vendidos = get_productos_mas_vendidos()
+    productos_mas_vendidos = [Producto.query.get(id_producto) for id_producto in ids_productos_mas_vendidos]
+    return productos_mas_vendidos
 
 
 @app.route("/vermas/<int:id>", methods=["POST", "GET"])
 def ver_mas(id):
-    producto = Precio.query.get(id)
-    subcategorias = producto.producto.id_sub_categoria
+    productos = Precio.query.get(id)
 
-    recomendaciones = Producto.query.filter(
-        Producto.id_sub_categoria == subcategorias).all()
-    return render_template("vermas.html", producto=producto, recomendaciones=recomendaciones)
+    subcategoria = productos.producto.id_sub_categoria
+    categoriass =SubCategoriaProducto.query.get(subcategoria)
+    id_categorias=categoriass.id_categoria
+    id_categorias = categoriass.id_categoria
+
+    recomendaciones = db.session.query(Producto, Precio).join(Precio).filter(
+        Producto.id_sub_categoria == subcategoria,
+        Producto.id != productos.producto.id
+    ).all()
+
+    # Obtener otras subcategorías de la misma categoría
+  
+
+
+    return render_template("vermas.html", productos=productos, recomendaciones=recomendaciones)
+
 
 
 @app.route("/perfil/<int:id>", methods=["POST", "GET"])
@@ -1433,12 +1443,13 @@ def guardar_venta():
         db.session.commit()
 
         detalles = session.get('detalles_venta', [])
+        totales=0
         for detalle in detalles:
             id_producto = detalle['id']
-            subtotal = detalle['precio'] * detalle['cantidad']
+           
             cantidad = detalle['cantidad']
             precio = detalle['precio']
-
+            subtotal = cantidad * precio
             detalle_venta = DetalleVenta(id_venta=venta.id, id_producto=id_producto,
                                          precio_unitario=precio, cantidad=cantidad, subtotal=subtotal)
             db.session.add(detalle_venta)

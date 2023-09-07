@@ -14,29 +14,24 @@
                 <div class="card-body">
                     <div class="container">
                         <div class="row">
-
                             <div class="col-12 col-sm-6">
-
-                                <img style="  max-width: 100%; height: auto;" src="{{producto.producto.logo}}" class="img-fluid" alt="Product Image">
-
+                                <img style="  max-width: 100%; height: auto;" src="{{productos.producto.logo}}"
+                                    class="img-fluid" alt="Product Image">
                             </div>
-
                             <div class="col-12 col-sm-6">
-                                <h3 class="my-3">{{producto.producto.nombre}}</h3>
-                                <p>{{producto.producto.descripcion}}.</p>
+                                <h3 class="my-3">{{productos.producto.nombre}}</h3>
+                                <p>{{productos.producto.descripcion}}.</p>
                                 <hr>
                                 <div class="bg-gray py-2 px-3 mt-4">
                                     <h2 class="mb-0">
-                                        Precio Unitario {{producto.precio_actual}}
+                                        Precio Unitario: C$ {{productos.precio_actual}}
                                     </h2>
-
                                 </div>
-
                                 <div class="mt-4">
                                     <form action="/agregar" method="post">
-                                        <input type="text" value="{{ producto.producto.id }}"
-                                            name="producto_id_{{ producto.producto.id }}" hidden>
-                                        <input type="text" name="cantidad_{{ producto.id }}" value="1" hidden>
+                                        <input type="text" value="{{ productos.producto.id }}"
+                                            name="producto_id_{{ productos.producto.id }}" hidden>
+                                        <input type="text" name="cantidad_{{ productos.id }}" value="1" hidden>
 
                                         <button type="submit" class="btn btn-primary btn-lg btn-flat">
 
@@ -47,10 +42,12 @@
                                 </div>
 
                                 <div class="mt-4 icon-group mb-4">
-                                    <a class="text-decoration-none icon-item shadow-social" id="facebook" href="#!"><i
-                                            class="fab fa-facebook-f"> </i></a>
-                                    <a class="text-decoration-none icon-item shadow-social" id="instagram" href="#!"><i
-                                            class="fab fa-instagram"> </i></a>
+                                    <a class="text-decoration-none icon-item shadow-social" id="facebook"
+                                        href="https://www.facebook.com/sharer/sharer.php?u=http://127.0.0.1:5000/vermas/{{productos.producto.id}}"
+                                        target="_blank"><i class="fab fa-facebook-f"> </i></a>
+                                    <a class="text-decoration-none icon-item shadow-social" id="instagram"
+                                        href="whatsapp://send?text=http://127.0.0.1:5000/vermas/{{productos.producto.id}}"
+                                        target="_blank"><i class="fab fa-instagram"> </i></a>
                                     <a class="text-decoration-none icon-item shadow-social" id="twitter" href="#!"><i
                                             class="fab fa-twitter"> </i></a>
                                 </div>
@@ -62,18 +59,42 @@
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                     <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-                                        aria-selected="true">Home</button>
+                                        aria-selected="true">Recomendaciones</button>
                                     <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-profile" type="button" role="tab"
-                                        aria-controls="nav-profile" aria-selected="false">Profile</button>
+                                        aria-controls="nav-profile" aria-selected="false">Reseñas</button>
                                     <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
                                         data-bs-target="#nav-contact" type="button" role="tab"
-                                        aria-controls="nav-contact" aria-selected="false">Contact</button>
+                                        aria-controls="nav-contact" aria-selected="false">Valoracion</button>
                                 </div>
                             </nav>
                             <div class="tab-content" id="nav-tabContent">
                                 <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
-                                    aria-labelledby="nav-home-tab">Hola</div>
+                                    aria-labelledby="nav-home-tab">
+
+                                    <article class="container-fluid">
+                                        <article class="row">
+                                            {% for producto, precio in recomendaciones %}
+                                            <div class="col-md-3 shadow-hover mb-4">
+                                                <div class="card">
+                                                    <img src="{{ producto.logo }}" class="card-img-top"
+                                                        alt="{{ producto.nombre }}" />
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                                                        <div class="card-text">
+                                                            <h5 class="mb-0"></h5>
+                                                            <h5 class="text-dark mb-2">Precio: {{ precio.precio_actual }}
+                                                            </h5>
+                                                            <a href="/vermas/{{precio.id}}" class="btn btn-success">Ver mas</a>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </article>
+                                    </article>
+                                </div>
                                 <div class="tab-pane fade" id="nav-profile" role="tabpanel"
                                     aria-labelledby="nav-profile-tab">Mundo</div>
                                 <div class="tab-pane fade" id="nav-contact" role="tabpanel"
