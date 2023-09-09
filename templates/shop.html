@@ -36,7 +36,7 @@
 		{% for producto in recomendaciones %}
 
 		<div class="col-md-2">
-			<div class="card">
+			<div class="card" style="height: 15rem;">
 				<img src="{{producto.logo}}" class="d-block w-100" alt="...">
 				<div class="card-body">
 
@@ -44,7 +44,8 @@
 					<form action="/agregar" method="post" class="card-text">
 						<input type="text" value="{{ producto.id }}" name="producto_id_{{ producto.id }}" hidden>
 						<input type="text" name="cantidad_{{ producto.id }}" value="1" hidden>
-						<button type="submit" class="btn btn-success"> Agregar al </a>
+						<button type="submit" class="btn btn-success"> Agregar <i
+							class="fas fa-shopping-cart"></i></a>
 					</form>
 				</div>
 			</div>

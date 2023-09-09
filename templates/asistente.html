@@ -332,7 +332,7 @@
         recognition.onresult = function (event) {
             var transcript = event.results[0][0].transcript;
             document.getElementById('text').value = transcript;
-            console.log('Texto reconocido:', transcript);
+            document.getElementById('text').focus();
         };
 
         recognition.onerror = function (event) {

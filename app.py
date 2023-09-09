@@ -8,7 +8,7 @@ import random
 from user_agents import parse
 from decimal import Decimal
 import string
-from flask import Flask, send_file, session, redirect, url_for, render_template, request, flash, jsonify
+from flask import Flask, send_file, session, redirect, url_for, render_template, request, flash, jsonify,make_response
 from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_session import Session
@@ -35,6 +35,10 @@ cloudinary.config(
     api_secret="ZMvKkXyeuKc6FA7D_rVzYborrCg"
 )
 app = Flask(__name__)
+import secrets
+nombre_cookie = secrets.token_urlsafe(16)
+
+
 
 # Check for environment variable
 # Set up database
@@ -42,6 +46,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SESSION_PERMANENT"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['SESSION_COOKIE_NAME'] = nombre_cookie
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -96,12 +101,16 @@ def home():
 @app.route("/logout/<int:id>", methods=["POST", "GET"])
 def logout(id):
     conexion = Conexion.query.get(id)
-    conexion.estado = 2
-    db.session.add(conexion)
-    db.session.commit()
-
+  
     # Borrar toda la sesión
     if id == session['id_conexion']:
+        conexion.estado = 2
+        db.session.add(conexion)
+        db.session.commit()
+        nombre_cookie = app.config['SESSION_COOKIE_NAME']
+        print(nombre_cookie)
+        
+        session.pop('id_conexion',None)
         session.clear()
 
     # Redireccionar al inicio de sesión
@@ -126,14 +135,10 @@ def acerca():
 def contacto():
     usuario = session.get('cliente_id')
     if usuario is None:
-        # La sesión no existe
-        # Realiza alguna acción o redirige a otra página
         return render_template('contacto.html')
     else:
-        # La sesión existe
-
+       
         return render_template('contacto.html', usuario=usuario)
-# FILTROS DE PRODUCTOS MAS VENDIDOS
 
 
 @app.route("/shop")
@@ -142,8 +147,6 @@ def shop():
     page = int(request.args.get('page', 1))
     categorias = select_categorias()
     recomendaciones=obtener_productos_mas_vendidos()
-    print(recomendaciones)
-    # Filtros
     categoria = request.args.get('categoria')
     precio_min = request.args.get('precio_min')
     precio_max = request.args.get('precio_max')
@@ -177,7 +180,6 @@ def obtener_productos_mas_vendidos():
 @app.route("/vermas/<int:id>", methods=["POST", "GET"])
 def ver_mas(id):
     productos = Precio.query.get(id)
-
     subcategoria = productos.producto.id_sub_categoria
     categoriass =SubCategoriaProducto.query.get(subcategoria)
     id_categorias=categoriass.id_categoria
@@ -189,9 +191,6 @@ def ver_mas(id):
     ).all()
 
     # Obtener otras subcategorías de la misma categoría
-  
-
-
     return render_template("vermas.html", productos=productos, recomendaciones=recomendaciones)
 
 
@@ -291,7 +290,6 @@ def cambiar_contraseñas():
         id = request.form.get('id')
         id_cliente = request.form.get('id_cliente')
         usuario = Usuario.query.get(id)
-        print(usuario)
         contraseña_anterior = request.form.get('contraseña_actual')
         contraseña_nueva = request.form.get('contraseña_nueva')
         confirmacion = request.form.get('confirmacion')
@@ -565,7 +563,6 @@ def producto_actualizar(producto_id):
                     flash("Error al actualizar la imagen: {}".format(
                         str(upload_error)), "error")
                     return redirect(url_for('producto'))
-        print(descripcion)
         producto.id_sub_categoria = id_sub_categoria
         producto.nombre = nombre
         producto.descripcion = descripcion
@@ -590,7 +587,6 @@ def producto_actualizar(producto_id):
 @login_required
 def eliminar_producto():
     producto_id = request.form.get("id")
-
     productos = Producto.query.get(producto_id)
 
     if productos:
@@ -762,7 +758,6 @@ def actualizar_trabajador(id):
     trabajador = Trabajador.query.get_or_404(id)
     persona = Persona.query.get_or_404(trabajador.id_persona)
     personanat = PersonaNatural.query.get_or_404(trabajador.id_persona)
-    print(personanat)
     if request.method == "POST":
         nombre = request.form.get('nombre')
         apellido = request.form.get('apellido')
@@ -924,11 +919,6 @@ def usuarios():
         Usuario.id_grupo != 2).order_by(Usuario.id_grupo).all()
     trabajadores = Trabajador.query.outerjoin(Usuario, and_(
         Usuario.id_persona == Trabajador.id_persona)).filter(Usuario.id_persona.is_(None)).all()
-    for usuario in usuarios:
-        print("ID:", usuario.id)
-        print("Nombre:", usuario.usuario)
-        print("ID Grupo:", usuario.id_grupo)
-
     return render_template("usuarios.html", trabajadores=trabajadores, usuarios=usuarios)
 
 
@@ -994,7 +984,7 @@ def verificar():
                 return redirect(url_for('usuarios'))
             else:
                 if usuario:
-                    print("Hola estoy aqui")
+                    
                     # Cambiar el estado del usuario a verificado (estado = 1)
                     usuario.estado = 1
                     db.session.commit()
@@ -1008,7 +998,7 @@ def verificar():
                 return redirect(url_for('usuarios'))
             else:
                 if usuario:
-                    print("Hola estoy aqui")
+                   
                     # Cambiar el estado del usuario a verificado (estado = 1)
                     usuario.estado = 1
                     db.session.commit()
@@ -1041,7 +1031,6 @@ def cambiar_contraseña():
     if request.method == "POST":
         id = request.form.get('id')
         usuario = Usuario.query.get(id)
-        print(usuario)
         contraseña_anterior = request.form.get('contraseña_actual')
         contraseña_nueva = request.form.get('contraseña_nueva')
         confirmacion = request.form.get('confirmacion')
@@ -1074,7 +1063,7 @@ def recuperar_contraseña():
     if request.method == "POST":
         correos = request.form.get('correo')
         usuario = Usuario.query.filter_by(usuario=correos).first()
-        print(usuario)
+        
 
         if usuario is None:
          # Manejar el caso cuando el usuario no existe
@@ -1111,8 +1100,6 @@ def nueva_contraseña():
         contraseña_anterior = request.form.get('codigo_verficacion')
         contraseña_nueva = request.form.get('contraseña_nueva')
         confirmacion = request.form.get('confirmacion')
-        print(contraseña_nueva)
-        print(confirmacion)
         if usuario is None:
             # Manejar el caso cuando el usuario no existe
             flash("El código no coincide, revisa tu correo nuevamente", "error")
@@ -1306,8 +1293,6 @@ def agregar():
                     return redirect('/shop')
             except Exception as e:
                 return jsonify({'message': 'Error al obtener el producto', 'error': str(e)}), 500
-
-    print("Carrito actualizado:", carrito)
     session['carrito'] = carrito
     flash("Producto agregado al carrito", "success")
     return redirect('/shop')
@@ -1646,8 +1631,6 @@ def eliminar_precio_servicio():
     return redirect(url_for('precio_servicios'))
 
 # Clientes
-
-
 @app.route("/clientes", methods=["POST", "GET"])
 @login_required
 def cliente():
@@ -1712,7 +1695,7 @@ def crear_cliente():
 def actualizar_cliente(id):
 
     cliente = Cliente.query.get(id)
-    print(cliente)
+ 
     if request.method == "POST":
         # Obtener los datos del formulario
         nombre = request.form.get("nombre")
@@ -2183,8 +2166,6 @@ def enviar_correo():
     msg = Message(subject, sender=(correo, nombre),
                   recipients=['ingsoftwar123@gmail.com'])
     msg.body = message_body
-    print(msg)
-
     # Enviar el correo
     try:
         mail.send(msg)
@@ -2219,8 +2200,6 @@ def crear_cat_preguntas():
 @login_required
 def actualizar_cat_preguntas(id):
     categorias = request.form.get("preguntas")
-    print(categorias)
-
     categoria = CatPregunta.query.get(id)
     categoria.categoria = categorias
     db.session.add(categoria)
@@ -2244,7 +2223,6 @@ def crear_preguntas():
     categoria = request.form.get("categoria")
     pregunta = request.form.get("pregunta")
     responder = request.form.get("responder")
-    print(responder)
     preguntas = Pregunta(
         id_cat=categoria, pregunta=pregunta, respuesta=responder)
     db.session.add(preguntas)
@@ -2284,15 +2262,16 @@ def api():
         .all()
     )
     consulta_producto = (
-        db.session.query(
-            SubCategoriaProducto.nombre.label('tag'),
-            Producto.nombre.label('producto'),
-            Producto.descripcion.label('respuesta')
-        )
-        .join(Producto, SubCategoriaProducto.id == Producto.id_sub_categoria)
-        .order_by(SubCategoriaProducto.nombre)
-        .all()
+    db.session.query(
+        SubCategoriaProducto.nombre.label('tag'),
+        Producto.nombre.label('producto'),
+        func.concat(Producto.descripcion, ' Precio actual en cordobas: ', Precio.precio_actual).label('respuesta')
     )
+    .join(Producto, SubCategoriaProducto.id == Producto.id_sub_categoria)
+    .join(Precio, Producto.id == Precio.id_producto)
+    .order_by(SubCategoriaProducto.nombre)
+    .all()
+)
 
     # Crear un diccionario defaultdict para agrupar resultados por etiqueta (tag)
     intents_dict = defaultdict(
@@ -2377,7 +2356,6 @@ def asistente():
 def chat():
     msg = request.form["msg"]
     input = msg
-    print(get_Chat_response(input))
     return get_Chat_response(input)
 
 
