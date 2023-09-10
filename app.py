@@ -28,6 +28,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
 model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+import matplotlib
+matplotlib.use('Agg')  # Modo no interactivo
+
+import matplotlib.pyplot as plt
+from io import BytesIO, StringIO
+import base64
 
 cloudinary.config(
     cloud_name="dxhb03y8f",
@@ -46,7 +52,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SESSION_PERMANENT"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SESSION_COOKIE_NAME'] = nombre_cookie
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -107,10 +112,6 @@ def logout(id):
         conexion.estado = 2
         db.session.add(conexion)
         db.session.commit()
-        nombre_cookie = app.config['SESSION_COOKIE_NAME']
-        print(nombre_cookie)
-        
-        session.pop('id_conexion',None)
         session.clear()
 
     # Redireccionar al inicio de sesión
@@ -1432,9 +1433,11 @@ def guardar_venta():
         for detalle in detalles:
             id_producto = detalle['id']
            
-            cantidad = detalle['cantidad']
-            precio = detalle['precio']
+            cantidad = int(detalle['cantidad'])
+            precio = float(detalle['precio'])
+           
             subtotal = cantidad * precio
+            print(subtotal)
             detalle_venta = DetalleVenta(id_venta=venta.id, id_producto=id_producto,
                                          precio_unitario=precio, cantidad=cantidad, subtotal=subtotal)
             db.session.add(detalle_venta)
@@ -1856,7 +1859,7 @@ def obtener_modulos_con_submodulos():
         resultado_final.append(
             {'modulo': modulo_actual, 'submodulos': submodulos_actual})
 
-    return render_template("modulos.html")
+    return jsonify(resultado_final)
 
 
 @app.route("/detalle_pedidos", methods=["GET", "POST"])
@@ -1997,6 +2000,7 @@ def ventas():
     ventas = Venta.query \
         .options(joinedload(Venta.tipo_venta), joinedload(Venta.cliente).joinedload(Cliente.persona)) \
         .filter(Venta.estado != 1) \
+        .order_by(Venta.estado == 2) \
         .all()
 
     # Obtener todas las ventas con detalles de productos
@@ -2339,7 +2343,7 @@ def get_Chat_response(text):
             max_similarity = similarity
             selected_response = responses[index]
 
-    if max_similarity > 0.75:  # Umbral de similitud personalizado
+    if max_similarity > 0.75: 
         return selected_response
     else:
         return "No comprendo tu pregunta, aun estoy en entrenamiento."
@@ -2347,8 +2351,6 @@ def get_Chat_response(text):
 
 @app.route("/asistente", methods=["GET", "POST"])
 def asistente():
-
-    # print(recommend(5,10))
     return render_template('asistente.html')
 
 
@@ -2357,6 +2359,54 @@ def chat():
     msg = request.form["msg"]
     input = msg
     return get_Chat_response(input)
+
+
+def get_productos_mas_vendidoss(cantidad):
+    productos_mas_vendidos = db.session.query(DetalleVenta.id_producto).group_by(
+        DetalleVenta.id_producto).order_by(func.sum(DetalleVenta.cantidad).desc()).limit(cantidad).all()
+    # Devuelve solo una lista de los IDs de los productos más vendidos
+    return [producto[0] for producto in productos_mas_vendidos]
+def obtener_productos_mas_vendidoss(cantidad):
+    ids_productos_mas_vendidos = get_productos_mas_vendidoss(cantidad)
+    productos_mas_vendidos = [Producto.query.get(id_producto) for id_producto in ids_productos_mas_vendidos]
+    return productos_mas_vendidos
+
+
+def generar_grafica():
+    categorias = ['Ventas por productos', 'Ventas por personalizacion']
+    Detalles=DetalleVenta.query.count()
+    personalizacion=VentaPersonalizacion.query.count()
+    valores = [Detalles,personalizacion]
+
+    plt.bar(categorias, valores)
+    plt.xlabel('Categorías')
+    plt.ylabel('Valores')
+    plt.title('Gráfico de Barras')
+
+    # Convertir la gráfica a una imagen base64
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    img_base64 = base64.b64encode(img.getvalue()).decode()
+
+    return img_base64
+
+@app.route("/dasboard",methods=["GET","POST"])
+@login_required
+def dashboard():
+    ventas= obtener_productos_mas_vendidoss(1)
+    cantidad_pedidos = Personalizacion.query.filter(Personalizacion.estado == 0).count()
+    cantidad_ventas=Venta.query.filter(Venta.estado==1).count()
+    cantidad_totales=Venta.query.filter(Venta.estado==3).count()
+    cantidad_anuladas=Venta.query.filter(Venta.estado==4).count()
+    numero_usuarios=Usuario.query.filter(Usuario.id_grupo !=1).count()
+    clientes=Clientes.query.count()
+    suma=cantidad_pedidos+cantidad_ventas
+    tasa_conversion=round((suma / numero_usuarios+clientes)*100)
+    tasa_venta=round((cantidad_totales/numero_usuarios)*100) 
+    tasa_anulada=round((cantidad_anuladas/numero_usuarios)*100)
+    grafica= generar_grafica()
+    return render_template("dasboard.html",cantidad_pedidos=cantidad_pedidos,cantidad_ventas=cantidad_ventas,cantidad_totales=cantidad_totales,cantidad_anuladas=cantidad_anuladas,tasa_conversion=tasa_conversion,tasa_venta=tasa_venta,numero_usuarios=clientes,tasa_anulada=tasa_anulada,grafica=grafica)
 
 
 if __name__ == '__main__':
