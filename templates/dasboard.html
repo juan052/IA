@@ -102,23 +102,7 @@
         </div>
         <div class="row">
             <!-- Left col -->
-            <section class="col-lg-6">
-                <!-- Custom tabs (Charts with tabs)-->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-pie mr-1"></i>
-                            Ventas
-                        </h3>
-
-                    </div><!-- /.card-header -->
-                    <div class="card-body">
-                        <img src="data:image/png;base64,{{ grafica }}" alt="" class="img-fluid">
-                    </div><!-- /.card-body -->
-                </div>
-            </section>
-            <!-- /.direct-chat-pane -->
-            <section class="col-lg-6">
+            <section class="col-lg-12">
 
                 <div class="card">
                     <div class="card-header border-0">
@@ -172,15 +156,42 @@
                     </div>
                 </div>
             </section>
+            <section class="col-lg-6">
+                <!-- Custom tabs (Charts with tabs)-->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie mr-1"></i>
+                            Tipos de ventas mas frecuentes
+                        </h3>
+
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <img src="data:image/png;base64,{{grafica}}" alt="tipos de ventas" class="img-fluid">
+                    </div><!-- /.card-body -->
+                </div>
+            </section>
+            <section class="col-lg-6">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie mr-1"></i>
+                            Productos mas vendidos
+                        </h3>
+            
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <img src="data:image/png;base64,{{ producto }}" alt="productos" class="img-fluid">
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </section>
+            <!-- /.direct-chat-pane -->
         </div>
     </div>
 </section>
 
-<section class="col-lg-5">
-
-
-    <!-- /.card -->
-</section>
 
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>

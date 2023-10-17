@@ -261,3 +261,20 @@ CREATE TABLE pregunta(
     pregunta VARCHAR(250) NOT NULL,
     respuesta TEXT NOT NULL
   );
+
+
+
+CREATE TABLE comentario(
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuario(id),
+    id_producto INTEGER REFERENCES producto(id),
+    comentario TEXT NOT NULL
+);
+
+
+CREATE TABLE valoracion(
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuario(id),
+    id_producto INTEGER REFERENCES producto(id),
+    puntos INTEGER NOT NULL
+);

@@ -96,7 +96,16 @@
                                     </article>
                                 </div>
                                 <div class="tab-pane fade" id="nav-profile" role="tabpanel"
-                                    aria-labelledby="nav-profile-tab">Mundo</div>
+                                    aria-labelledby="nav-profile-tab">
+                                    <form action="">
+                                        <input type="text" name="id_producto" hidden value="">
+                                        <input type="text" name="id_usuario" value="{{session['cliente_usuario']}}" hidden>
+                                        <textarea name="comentario" id="" cols="30" rows="10">
+
+                                        </textarea>
+                                        <button type="submit">Enviar comentario</button>
+                                    </form>
+                                </div>
                                 <div class="tab-pane fade" id="nav-contact" role="tabpanel"
                                     aria-labelledby="nav-contact-tab">Hola</div>
                             </div>

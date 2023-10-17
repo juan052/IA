@@ -5,6 +5,7 @@ import os
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date
 import random
+from matplotlib import image
 from user_agents import parse
 from decimal import Decimal
 import string
@@ -30,11 +31,17 @@ tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
 model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
 import matplotlib
 matplotlib.use('Agg')  # Modo no interactivo
-
 import matplotlib.pyplot as plt
 from io import BytesIO, StringIO
 import base64
-
+from PIL import Image
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from datetime import datetime, timedelta
+from fpdf import FPDF
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from collections import defaultdict
 cloudinary.config(
     cloud_name="dxhb03y8f",
     api_key="372496255286474",
@@ -2377,11 +2384,11 @@ def generar_grafica():
     Detalles=DetalleVenta.query.count()
     personalizacion=VentaPersonalizacion.query.count()
     valores = [Detalles,personalizacion]
-
+    plt.figure(figsize=(8, 6))
     plt.bar(categorias, valores)
     plt.xlabel('Categorías')
     plt.ylabel('Valores')
-    plt.title('Gráfico de Barras')
+    plt.title('Ventas mas frecuentes')
 
     # Convertir la gráfica a una imagen base64
     img = BytesIO()
@@ -2390,6 +2397,40 @@ def generar_grafica():
     img_base64 = base64.b64encode(img.getvalue()).decode()
 
     return img_base64
+def obtener_productos_mas_vendidos():
+    productos_mas_vendidos = db.session.query(
+        Producto.id, Producto.nombre, Producto.logo,
+        func.sum(DetalleVenta.cantidad).label('total_vendido')
+    ).join(
+        DetalleVenta,
+        Producto.id == DetalleVenta.id_producto
+    ).group_by(
+        Producto.id
+    ).order_by(
+        func.sum(DetalleVenta.cantidad).desc()
+    ).limit(5).all()
+
+    return productos_mas_vendidos
+
+def generar_grafica_pastel():
+    # Obtener los datos
+    productos_mas_vendidos = obtener_productos_mas_vendidos()
+    nombres_productos = [producto.nombre for producto in productos_mas_vendidos]
+    ventas = [producto.total_vendido for producto in productos_mas_vendidos]
+
+    # Crear el gráfico de pastel
+    plt.figure(figsize=(8, 8))
+    plt.pie(ventas, labels=nombres_productos, autopct='%1.1f%%', startangle=140)
+    plt.title('Productos Más Vendidos')
+
+    # Convertir la gráfica a una imagen base64
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    img_base64 = base64.b64encode(img.getvalue()).decode()
+    
+    return img_base64
+
 
 @app.route("/dasboard",methods=["GET","POST"])
 @login_required
@@ -2406,7 +2447,210 @@ def dashboard():
     tasa_venta=round((cantidad_totales/numero_usuarios)*100) 
     tasa_anulada=round((cantidad_anuladas/numero_usuarios)*100)
     grafica= generar_grafica()
-    return render_template("dasboard.html",cantidad_pedidos=cantidad_pedidos,cantidad_ventas=cantidad_ventas,cantidad_totales=cantidad_totales,cantidad_anuladas=cantidad_anuladas,tasa_conversion=tasa_conversion,tasa_venta=tasa_venta,numero_usuarios=clientes,tasa_anulada=tasa_anulada,grafica=grafica)
+    producto=generar_grafica_pastel()
+
+    return render_template("dasboard.html",cantidad_pedidos=cantidad_pedidos,cantidad_ventas=cantidad_ventas,cantidad_totales=cantidad_totales,cantidad_anuladas=cantidad_anuladas,tasa_conversion=tasa_conversion,tasa_venta=tasa_venta,numero_usuarios=clientes,tasa_anulada=tasa_anulada,grafica=grafica,producto=producto)
+
+
+@app.route("/comentario",methods=["POST","GET"])
+def comentarios():
+    id_producto = request.form.get("id_producto")
+    id_usuario=request.form.get("id_usuario")
+    comentario=request.form.get("comentario")
+
+    return redirect("/shop")
+def obtener_clientes_con_mayores_compras():
+    # Obtener la lista de clientes y sus totales de compras
+    clientes_con_totales = db.session.query(
+        Cliente,
+        func.sum(Venta.total).label('total_compras')
+    
+    ).join(
+        Venta.cliente
+    ).group_by(
+        Cliente.id
+    ).all()
+
+    # Ordenar los resultados por porcentaje de compras en orden descendente
+    clientes_con_totales = sorted(clientes_con_totales, key=lambda x: x.total_compras, reverse=True)
+    cliente_total_dict = {cliente.persona.nombre: total_compras for cliente, total_compras in clientes_con_totales}
+
+    # Tomar los 10 primeros
+    clientes_top_10=cliente_total_dict
+    return clientes_top_10
+
+def generar_reporte_entregas():
+    # Obtener la fecha de hoy
+    hoy = datetime.now().date()
+
+    # Calcular las fechas para los próximos tres días
+    fechas_entrega = [hoy + timedelta(days=i) for i in range(3)]
+
+    # Filtrar las ventas que tienen fecha de entrega en los próximos tres días
+    ventas_proximos_tres_dias = Venta.query.filter(Venta.fecha_entrega.in_(fechas_entrega)).all()
+
+    # Generar el reporte
+    reporte_entregas = []
+
+    for venta in ventas_proximos_tres_dias:
+        reporte_entregas.append({
+            'Cliente': venta.cliente.persona.nombre,
+            'Fecha de Entrega': venta.fecha_entrega,
+            'Tipo de Entrega': venta.tipo_entrega,
+            'Total de Compra': venta.total
+        })
+
+    return reporte_entregas
+
+def generar_reporte_entregas_pdf(reporte_entregas):
+    # Crear un objeto PDF
+    pdf_filename = 'static/reporte_entregas.pdf'
+    doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+
+    # Crear el contenido del informe
+    styles = getSampleStyleSheet()
+
+    # Crear una tabla con los detalles de las entregas
+    headers = ['Cliente', 'Fecha de Entrega', 'Tipo de Entrega', 'Total de Compra']
+    data = [headers]
+
+    for entrega in reporte_entregas:
+        data.append([
+            entrega['Cliente'],
+            entrega['Fecha de Entrega'],
+            entrega['Tipo de Entrega'],
+            entrega['Total de Compra']
+        ])
+
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), (0.8, 0.8, 0.8)),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, (0, 0, 0))
+    ]))
+
+    # Crear un objeto Paragraph para el título
+    titulo = Paragraph("Reporte de Entregas", styles['Title'])
+
+    # Construir el PDF
+    contenido = [titulo, table]
+    doc.build(contenido)
+
+    return pdf_filename
+def calculate_similaritys(user_input, patterns):
+    vectorizer = TfidfVectorizer()
+    pattern_vectors = vectorizer.fit_transform(patterns)
+    user_input_vector = vectorizer.transform([user_input])
+    similarities = cosine_similarity(user_input_vector, pattern_vectors)
+    max_similarity_index = similarities.argmax()
+    max_similarity = similarities[0, max_similarity_index]
+    return float(max_similarity)  # Convertimos a float
+
+def obtener_respuesta(pregunta):
+    cuerpo = '''Estimado cliente,
+Nos complace informarte que tu pedido ha sido preparado y está listo para su entrega/recogida. Por favor, pasa por nuestro establecimiento en el siguiente horario:
+entra a nuestro sitio a web y revisa en el apartado de pedido encontras toda la informacion que necesites
+Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.
+
+¡Esperamos que disfrutes de tu compra!'''
+
+    # Definir las acciones para cada pregunta
+    acciones = {
+        "Cliente que mas compra":  lambda:obtener_clientes_con_mayores_compras,
+        "Lista de entrega de pedidos":  lambda:generar_reporte_entregas,
+        "Genera reporte en pdf de las entregas": lambda: generar_reporte_entregas_pdf(generar_reporte_entregas()),
+        "Productos mas vendidos":lambda: obtener_productos_mas_vendidos,
+        "Envia correos a los cliente que sus pedidos estan listo": lambda: enviar_correo_a_todos_asunto_cuerpo("Informe",cuerpo)
+
+    }
+
+    # Verificar si la pregunta tiene una acción asociada
+    if pregunta in acciones:
+        resultado = acciones[pregunta]()
+        if isinstance(resultado, dict):
+            # Si es un diccionario, lo convertimos a una cadena de texto
+            resultado = '\n'.join([f'{k}: {v}' for k, v in resultado.items()])
+        elif isinstance(resultado, list):
+            # Si es una lista, lo convertimos a una cadena de texto
+            resultado = '\n'.join(map(str, resultado))
+
+        return resultado
+    else:
+        return "No tengo una respuesta para esa pregunta."
+
+# Ejemplo de uso
+
+def get_Chat_responses(text):
+    user_input = text.lower()
+
+    # Definir las preguntas
+    preguntas = [
+        "Cliente que mas compra",
+        "Lista de entrega de pedidos",
+        "Genera reporte en pdf de las entregas",
+        "Productos mas vendidos",
+        "Envia correos a los cliente que sus pedidos estan listo"
+    ]
+
+    max_similarity = 0.0
+    selected_response = "No entiendo tu pregunta."
+
+    for pregunta in preguntas:
+        patterns = [pregunta.lower()]  # Solo hay un patrón que es la pregunta misma
+        similarity = calculate_similaritys(user_input, patterns)
+        
+        if similarity > max_similarity:
+            max_similarity = similarity
+            selected_response = obtener_respuesta(pregunta)
+
+    if max_similarity > 0.75: 
+        return selected_response
+    else:
+        return "No comprendo tu pregunta, aun estoy en entrenamiento."
+    
+
+def obtener_correos_clientes_venta_estado_dos():
+    clientes_con_venta_estado_dos = Cliente.query.join(Venta).filter(Venta.estado == 2).all()
+    correos = [cliente.persona.correo for cliente in clientes_con_venta_estado_dos]
+    return correos
+
+def enviar_correo_a_todos_asunto_cuerpo(asunto, cuerpo):
+    # Obtener la lista de correos electrónicos de los clientes con ventas en estado 2
+    correos_clientes_estado_dos = obtener_correos_clientes_venta_estado_dos()
+
+    # Comprobar si hay correos electrónicos para enviar
+    if correos_clientes_estado_dos:
+        # Crear el mensaje
+        sender='ingsoftwar123@gmail.com'
+        mensaje = Message(sender='ingsoftwar123@gmail.com', recipients=correos_clientes_estado_dos)
+        mensaje.body = cuerpo
+
+        try:
+            # Enviar el mensaje
+            mail.send(mensaje)
+            return "Se han enviado todos los correos correctamente."
+        except Exception as e:
+            return f"Error al enviar correos: {str(e)}"
+    else:
+        return "No hay correos electrónicos para enviar."
+
+
+@app.route("/gets", methods=["GET", "POST"])
+def chats():
+    msg = request.form["msg"]
+    input = msg
+    respuesta = obtener_correos_clientes_venta_estado_dos()
+    print(respuesta)
+    return get_Chat_responses(input)
+   
+@app.route("/luxx_art",methods=["POST","GET"])
+def luxx():
+    return redirect("/admin")
+
+
+
 
 
 if __name__ == '__main__':

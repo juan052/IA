@@ -403,4 +403,12 @@
     }
 
 </script>
+<script>
+    $(document).ready(function(){
+        // Esto hace un auto-scroll hacia el final del contenedor cada vez que se agrega contenido
+        $('#messageFormeight').animate({
+            scrollTop: $('#messageFormeight').get(0).scrollHeight
+        }, 10000);
+    });
+    </script>
 {% endblock %}

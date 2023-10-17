@@ -157,6 +157,7 @@ class Clientes(db.Model):
     foto = db.Column(db.String(250))
     estado = db.Column(db.Integer)
     persona = relationship('Persona')
+    
 
     def __init__(self, id_persona, tipo_cliente, foto=None, estado=None):
         self.id_persona = id_persona
@@ -451,3 +452,16 @@ class Pregunta(db.Model):
         self.id_cat=id_cat
         self.pregunta=pregunta
         self.respuesta=respuesta
+
+class Comentario(db.Model):
+    __tablename__='comentario'
+    id=db.Column(db.Integer,primary_key=True)
+    id_usuario=db.Column(db.Integer,db.ForeignKey('usuario.id'))
+    id_producto=db.Column(db.Integer,db.ForeignKey('producto.id'))
+    comentario=db.Column(db.Text(1500),nullable=False)
+
+    def __init__(self,id_usuario,id_producto,comentario):
+        self.id_usuario=id_usuario
+        self.id_producto=id_producto
+        self.comentario=comentario
+

@@ -41,11 +41,12 @@
 
                 <!-- Messages Dropdown Menu -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        Asistente Luxx 
+                    <button type="button" href="#" class="btn btn-secondary" data-toggle="modal"
+                        data-target="#modal-defaults">
+                        Asistente Luxx
                         <i class="far fa-comments"></i>
-                      
-                    </a>
+
+                    </button>
                 </li>
 
                 <li class="nav-item">
@@ -315,7 +316,327 @@
             <!-- Contenido específico de la página -->
             {% endblock %}
         </div>
+        <style>
+            .chat {
+                margin-top: auto;
+                margin-bottom: auto;
+            }
 
+
+            .cards {
+                background-color: #1c2333;
+                border-radius: 15px !important;
+                height: 450px;
+            }
+
+            .card-headers {
+                background-color: #233e50;
+                border-radius: 15px 15px 0 0 !important;
+                border-bottom: 0 !important;
+                height: min-content;
+            }
+
+            .card-footers {
+                border-radius: 0 0 15px 15px !important;
+                border-top: 0 !important;
+            }
+
+            .contacts_body {
+                padding: 0.75rem 0 !important;
+                overflow-y: auto;
+                white-space: nowrap;
+            }
+
+            .msg_card_body {
+                overflow-y: auto;
+            }
+
+            .card-headers {
+                border-radius: 15px 15px 0 0 !important;
+                border-bottom: 0 !important;
+            }
+
+            .card-footers {
+                border-radius: 0 0 15px 15px !important;
+                border-top: 0 !important;
+                background: #1e4b7a;
+            }
+
+            .containers {
+                align-content: center;
+            }
+
+            .search {
+                border-radius: 15px 0 0 15px !important;
+                background-color: rgb(255, 255, 255) !important;
+                border: 0 !important;
+                color: rgb(12, 12, 12) !important;
+            }
+
+            .search:focus {
+                box-shadow: none !important;
+                outline: 0px !important;
+            }
+
+            .type_msg {
+                background-color: rgba(0, 0, 0, 0.3) !important;
+                border: 0 !important;
+                color: rgb(255, 255, 255) !important;
+                height: 60px !important;
+                overflow-y: auto;
+            }
+
+            .type_msg:focus {
+                box-shadow: none !important;
+                outline: 0px !important;
+            }
+
+            .attach_btn {
+                border-radius: 15px 0 0 15px !important;
+                background-color: rgba(0, 0, 0, 0.3) !important;
+                border: 0 !important;
+                color: white !important;
+                cursor: pointer;
+            }
+
+            .send_btn {
+                border-radius: 0 15px 15px 0 !important;
+                background-color: rgba(0, 0, 0, 0.3) !important;
+                border: 0 !important;
+                color: white !important;
+                cursor: pointer;
+            }
+
+            .search_btn {
+                border-radius: 0 15px 15px 0 !important;
+                background-color: rgba(0, 0, 0, 0.3) !important;
+                border: 0 !important;
+                color: white !important;
+                cursor: pointer;
+            }
+
+            .contacts {
+                list-style: none;
+                padding: 0;
+            }
+
+            .contacts li {
+                width: 100% !important;
+                padding: 5px 10px;
+                margin-bottom: 15px !important;
+            }
+
+            .active {
+                background-color: rgb(11, 212, 55);
+            }
+
+            .user_img {
+                height: 70px;
+                width: 70px;
+                border: 1.5px solid #ced10a;
+
+            }
+
+            .user_img_msg {
+                height: 40px;
+                width: 40px;
+                border: 1.5px solid #f5f6fa;
+
+            }
+
+            .img_cont {
+                position: relative;
+                height: 70px;
+                width: 70px;
+            }
+
+            .img_cont_msg {
+                height: 40px;
+                width: 40px;
+            }
+
+            .online_icon {
+                position: absolute;
+                height: 15px;
+                width: 15px;
+                background-color: #4cd137;
+                border-radius: 50%;
+                bottom: 0.2em;
+                right: 0.4em;
+                border: 1.5px solid white;
+            }
+
+            .offline {
+                background-color: #c23616 !important;
+            }
+
+            .user_info {
+                margin-top: auto;
+                margin-bottom: auto;
+                margin-left: 15px;
+            }
+
+            .user_info span {
+                font-size: 20px;
+                color: white;
+            }
+
+            .user_info p {
+                font-size: 10px;
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            .video_cam {
+                margin-left: 50px;
+                margin-top: 5px;
+            }
+
+            .video_cam span {
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                margin-right: 20px;
+            }
+
+            .msg_cotainer {
+                margin-top: auto;
+                margin-bottom: auto;
+                margin-left: 10px;
+                border-radius: 25px;
+                background-color: #1e4b7a;
+                padding: 10px;
+                color: white;
+                position: relative;
+            }
+
+            .msg_cotainer_send {
+                margin-top: auto;
+                margin-bottom: auto;
+                margin-right: 10px;
+                border-radius: 25px;
+                background-color: #58cc71;
+                padding: 10px;
+                position: relative;
+                color: white;
+            }
+
+            .msg_time {
+                position: absolute;
+                left: 0;
+                bottom: -15px;
+                color: rgb(255, 255, 255);
+                font-size: 10px;
+            }
+
+            .msg_time_send {
+                position: absolute;
+                right: 0;
+                bottom: -15px;
+                color: rgb(250, 248, 248);
+                font-size: 10px;
+            }
+
+            .msg_head {
+                position: relative;
+            }
+
+            #action_menu_btn {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: rgb(204, 27, 27);
+                cursor: pointer;
+                font-size: 20px;
+            }
+
+            .action_menu {
+                z-index: 1;
+                position: absolute;
+                padding: 15px 0;
+                background-color: rgb(252, 252, 252);
+                color: white;
+                border-radius: 15px;
+                top: 30px;
+                right: 15px;
+                display: none;
+            }
+
+            .action_menu ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .action_menu ul li {
+                width: 100%;
+                padding: 10px 15px;
+                margin-bottom: 5px;
+            }
+
+            .action_menu ul li i {
+                padding-right: 10px;
+            }
+
+            .action_menu ul li:hover {
+                cursor: pointer;
+                background-color: rgb(255, 255, 255);
+            }
+
+            @media(max-width: 576px) {
+                .contacts_card {
+                    margin-bottom: 15px !important;
+                }
+            }
+        </style>
+        <div id="modal-defaults" class="modal fade">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h4 class="modal-title">Asistente Luxx Art</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card-headers msg_head">
+                            <div class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    <img src="https://res.cloudinary.com/dxhb03y8f/image/upload/v1691826766/5_zineop.png"
+                                        class="round-btn-lg rounded-circle me-3 shadow" width="50">
+                                    <span class="online_icon"></span>
+                                </div>
+                                <div class="user_info">
+                                    <span>Asistente Luxx</span>
+                                    <p>Has tus consultas!</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="messageFormeight" class="card-bodys msg_card_body">
+
+
+                        </div>
+                        <div class="card-footers">
+                            <form id="messageArea" class="input-group">
+                                <input type="text" id="text" name="msg" placeholder="Escribe un mensaje"
+                                    autocomplete="off" class="form-control type_msg rounded-pill" required />
+
+                                <div class="input-group-btn d-flex justify-content-center">
+
+                                    <button type="button" id="mic" class="btn btn-success rounded  m-2">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                    <button type="submit" id="send" class="btn btn-primary m-2">
+                                        <i class="fas fa-location-arrow"></i>
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
         <footer class="main-footer">
             <div class="float-right d-none d-sm-block">
                 <b>Version</b> 3.2.0
@@ -327,13 +648,109 @@
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
+
         </aside>
         <!-- /.control-sidebar -->
     </main>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        if ('webkitSpeechRecognition' in window) {
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function (event) {
+                var transcript = event.results[0][0].transcript;
+                document.getElementById('text').value = transcript;
+                document.getElementById('text').focus();
+            };
+
+            recognition.onerror = function (event) {
+                console.error('Error de reconocimiento:', event.error);
+            };
+
+            document.getElementById('mic').addEventListener('click', function () {
+                recognition.start();
+            });
+        } else {
+            console.log('El navegador no admite la API Web Speech');
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#messageArea").on("submit", function (event) {
+                const date = new Date();
+                const hour = date.getHours();
+                const minute = date.getMinutes();
+                const str_time = hour + ":" + minute;
+                var rawText = $("#text").val();
+
+                var userHtml = '';
+
+                if ("{{session['cliente_foto']}}" !== "") {
+                    userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">' + str_time + '</span></div><img src="{{session["trabajador_foto"]}}" width="50" class="round-btn-lg rounded-circle me-3 shadow"></div>';
+                } else {
+                    userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">' + str_time + '</span></div><img src="https://res.cloudinary.com/dxhb03y8f/image/upload/v1691799206/ieoncbrhjiwhe3ndwnwk.jpg" width=50 class="round-btn-lg rounded-circle me-3 shadow"></div>';
+                }
+
+                $("#text").val("");
+                $("#messageFormeight").append(userHtml);
+
+                $.ajax({
+                    data: {
+                        msg: rawText,
+                    },
+                    type: "POST",
+                    url: "/gets",
+                }).done(function (data) {
+                    $("#messageFormeight .msg_cotainer:last").find(".audio").remove();
+                    if (data === 'static/reporte_entregas.pdf') {
+                        var botHtml = '<div class="d-flex justify-content-start mb-4"><div id="msg_cotainer" class="msg_cotainer"><a href="' + data + '" target="_blank">Descargar Reporte</a><span class="msg_time">' + str_time + '</span><button type="button" id="audio" class="btn btn-success rounded m-2 audio"><i class="fas fa-volume-up"></i></button></div></div>';
+                    } else {
+                        var botHtml = '<div class="d-flex justify-content-start mb-4"><div id="msg_cotainer" class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span><button type="button" id="audio" class="btn btn-success rounded m-2 audio"><i class="fas fa-volume-up"></i></button></div></div>';
+                    }
+
+                    $("#messageFormeight").append($.parseHTML(botHtml));
+                    document.getElementById('audio').addEventListener('click', function () {
+                        var mensaje = data; // Aquí debes obtener el contenido de tu mensaje
+                        leerMensaje(mensaje);
+                    });
+                });
+                event.preventDefault();
+            });
+        });
+    </script>
+    <script>
+        function leerMensaje(mensaje) {
+            // Comprobar si el navegador admite la API de Text-to-Speech
+            if ('speechSynthesis' in window) {
+                // Crear una nueva instancia del objeto SpeechSynthesisUtterance
+                var mensajeVoz = new SpeechSynthesisUtterance(mensaje);
+
+                // Usar la voz predeterminada del sistema (puedes personalizarlo)
+                mensajeVoz.voice = speechSynthesis.getVoices()[0];
+
+                // Reproducir el mensaje en voz alta
+                speechSynthesis.speak(mensajeVoz);
+            } else {
+                alert('Tu navegador no admite la síntesis de voz.');
+            }
+        }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Esto hace un auto-scroll hacia el final del contenedor cada vez que se agrega contenido
+            $('#messageFormeight').animate({
+                scrollTop: $('#messageFormeight').get(0).scrollHeight
+            }, 10000);
+        });
+    </script>
     <script src="{{ url_for('static', filename='plugins/jquery/jquery.min.js') }}"></script>
-   
-<!-- jQuery UI 1.11.4 -->
-<script src="{{ url_for('static', filename='plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+
+    <!-- jQuery UI 1.11.4 -->
+    <script src="{{ url_for('static', filename='plugins/jquery-ui/jquery-ui.min.js') }}"></script>
     <!-- Bootstrap 4 -->
     <script src="{{ url_for('static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->

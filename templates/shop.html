@@ -35,17 +35,16 @@
 		<h2>Recomendaciones</h2>
 		{% for producto in recomendaciones %}
 
-		<div class="col-md-2">
-			<div class="card" style="height: 15rem;">
-				<img src="{{producto.logo}}" class="d-block w-100" alt="...">
+		<div class="col-md-2 col-sm-4 col-6">
+			<div class="card h-100" style="height: 15rem;">
+				<img src="{{producto.logo}}" class="d-block w-100 img-fluid" alt="...">
 				<div class="card-body">
 
 					<h5 class="card-title">{{producto.nombre}}</h5>
 					<form action="/agregar" method="post" class="card-text">
 						<input type="text" value="{{ producto.id }}" name="producto_id_{{ producto.id }}" hidden>
 						<input type="text" name="cantidad_{{ producto.id }}" value="1" hidden>
-						<button type="submit" class="btn btn-success"> Agregar <i
-							class="fas fa-shopping-cart"></i></a>
+						<button type="submit" class="btn btn-success"> Agregar <i class="fas fa-shopping-cart"></i></a>
 					</form>
 				</div>
 			</div>
@@ -53,7 +52,7 @@
 		{% endfor %}
 
 	</div>
-</div><!-- end of .container-->
+</div>
 
 <section class="container-fluid  my-4">
 	<div class="mb-7 text-center">
@@ -97,11 +96,11 @@
 										<input type="number" class="form-control" id="precio_max" name="precio_max"
 											min="0">
 									</div>
+									<div class="m-2">
+										<!-- Botón para aplicar filtros -->
+										<button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+									</div>
 
-
-
-									<!-- Botón para aplicar filtros -->
-									<button type="submit" class="btn btn-primary">Aplicar Filtros</button>
 								</form>
 							</div>
 
@@ -117,9 +116,9 @@
 					<div class="col-md-4 my-4">
 						<form action="/agregar" method="post">
 							<div class="shadow">
-								<div class="card h-100" style="max-width: 15rem; background: white;">
-									<img class="card-img-top" src="{{producto.producto.logo}}"
-										alt="{{producto.producto.nombre}}" class="img-fluid" />
+								<div class="card h-100" style="max-width: 15rem;">
+									<img  src="{{producto.producto.logo}}"
+										alt="{{producto.producto.nombre}}" class="d-block w-100 img-fluid" />
 									<div class="card-body">
 
 										<h5 class="card-title">{{producto.producto.nombre}}</h5>
