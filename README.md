@@ -1,2 +1,16 @@
-# IA
-Eccomerce
+
+Luxx Art - Plataforma de eCommerce de Arte en Lienzo y Pulseras
+
+Descripción del Proyecto
+Luxx Art es un pequeño emprendimiento dedicado a la venta de arte en lienzo y pulseras únicas y elegantes. Esta plataforma de eCommerce ofrece una amplia variedad de productos artísticos creados por talentosos artistas locales y diseñadores de joyas, con el objetivo de brindar a los clientes la oportunidad de adquirir obras de arte exclusivas y accesorios de moda de alta calidad.
+
+El proyecto Luxx Art incluye tanto una parte administrativa para gestionar el inventario, los pedidos y los clientes, como una página web para que los usuarios puedan explorar y realizar compras de manera conveniente. Además, cuenta con un asistente virtual para brindar asistencia y responder a consultas básicas e informativas de los clientes.
+
+Características Principales
+eCommerce de Arte en Lienzo y Pulseras: La plataforma ofrece una amplia gama de productos, que incluyen obras de arte en lienzo de diversos estilos y tamaños, así como elegantes pulseras diseñadas con materiales de alta calidad.
+
+Parte Administrativa: Un panel de administración intuitivo que permite a los propietarios del negocio gestionar fácilmente el inventario de productos, procesar pedidos, administrar clientes y realizar un seguimiento de las ventas.
+
+Página Web para Compras: Una interfaz de usuario atractiva y fácil de navegar que permite a los visitantes explorar los productos disponibles, ver detalles y precios, agregar artículos al carrito de compras y completar el proceso de pago de manera segura y eficiente.
+
+Asistente Virtual: Un chatbot integrado en la página web que brinda asistencia instantánea a los usuarios, respondiendo preguntas frecuentes, proporcionando información sobre productos y ayudando en el proceso de compra.
