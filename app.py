@@ -43,9 +43,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from collections import defaultdict
 cloudinary.config(
-    cloud_name="dxhb03y8f",
-    api_key="372496255286474",
-    api_secret="ZMvKkXyeuKc6FA7D_rVzYborrCg"
+    cloud_name="",
+    api_key="",
+    api_secret=""
 )
 app = Flask(__name__)
 import secrets
@@ -62,11 +62,11 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'ingsoftwar123@gmail.com'
-app.config['MAIL_PASSWORD'] = 'xishvjfvtnrabdpj'
+app.config['MAIL_USERNAME'] = ''
+app.config['MAIL_PASSWORD'] = ''
 app.secret_key = 'tu_clave_secreta'
-account_sid = 'AC4758eb208264635a3c58aa454bd39dde'
-auth_token = '5795809fa88e649a310bd23103afbbd0'
+account_sid = ''
+auth_token = ''
 client = Client(account_sid, auth_token)
 
 mail = Mail(app)
